@@ -52,8 +52,8 @@ public class EstudiosController {
 		return student;
 	}
 	
-	@DeleteMapping("/delete/{studentId}")
-	public void delete(@PathVariable("studentId") Long studentId){
-		estudiosServices.delete(studentId);
+	@DeleteMapping("/delete/{estudioid}")
+	public void delete(@PathVariable("estudioid") Long estudioid){
+		estudiosServices.delete(estudioid);
 	}
 }
