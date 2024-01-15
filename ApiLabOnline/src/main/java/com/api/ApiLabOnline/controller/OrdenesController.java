@@ -22,10 +22,10 @@ public class OrdenesController {
 	@Autowired
 	private OrdenesService ordenesService;
 	
-	@GetMapping("/list/")
-	public String getAll(@RequestParam("limit") int limit,@RequestParam("offset") int offset){
-		System.out.println("Si llego all limit["+limit+"] offset["+offset+"]");
-		JsonArray list = ordenesService.listOrdenes(limit, offset);
+	@GetMapping("/list")
+	public String getAll(){
+		System.out.println("Si llego all ");
+		JsonArray list = ordenesService.listOrdenes(10000, 1);
 		if(list!=null)
 			System.out.println("Encontro "+list.size()+" elementos");
 		return list.toString();
