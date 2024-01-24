@@ -36,7 +36,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         final String token = getTokenFromRequest(request);
         String username;
-        System.out.println("valida >>"+token);
+//        System.out.println("valida >>"+token);
         if(token ==null) {
         	log.info("Validacion de token no exitosa ");
             filterChain.doFilter(request, response);
@@ -63,13 +63,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private String getTokenFromRequest(HttpServletRequest request) {
         final String authHeader=request.getHeader(HttpHeaders.AUTHORIZATION);
         
-        System.out.println("authHeader >> "+authHeader);
-        
-        Enumeration headerNames = request.getHeaderNames();
-        while(headerNames.hasMoreElements()) {
-          String headerName = (String)headerNames.nextElement();
-          System.out.println(headerName+" ["+ request.getHeader(headerName)+"]");
-        }
+//        System.out.println("authHeader >> "+authHeader);
+//        
+//        Enumeration headerNames = request.getHeaderNames();
+//        while(headerNames.hasMoreElements()) {
+//          String headerName = (String)headerNames.nextElement();
+//          System.out.println(headerName+" ["+ request.getHeader(headerName)+"]");
+//        }
         
         if(StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ")) {
             return authHeader.substring(7);
