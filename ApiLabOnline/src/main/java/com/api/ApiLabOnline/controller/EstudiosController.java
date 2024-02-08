@@ -1,8 +1,5 @@
 package com.api.ApiLabOnline.controller;
 
-import java.util.List;
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.api.ApiLabOnline.entity.Estudios;
 import com.api.ApiLabOnline.services.EstudiosServices;
 import com.google.gson.JsonArray;
 
@@ -44,14 +40,14 @@ public class EstudiosController {
 	}
 	
 	@GetMapping("/search/{estudioid}")
-	public Optional<Estudios> getById(@PathVariable("estudioid") Long estudioid){
-		return estudiosServices.getEstudio(estudioid);
+	public String getById(@PathVariable("estudioid") Long estudioid){
+		return estudiosServices.getEstudio(estudioid).toString();
 	}
 	
 	@PostMapping("/save")
-	public Estudios saveUpdate(@RequestBody Estudios student){
-		estudiosServices.saveOrUpdate(student);
-		return student;
+	public String saveUpdate(@RequestBody String estudio){
+		estudiosServices.saveOrUpdate(estudio);
+		return estudio;
 	}
 	
 	@DeleteMapping("/delete/{estudioid}")

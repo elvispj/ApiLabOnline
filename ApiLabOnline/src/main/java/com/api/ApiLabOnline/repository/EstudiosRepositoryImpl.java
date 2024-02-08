@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.api.ApiLabOnline.entity.Estudios;
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -43,36 +44,37 @@ public class EstudiosRepositoryImpl implements EstudiosRepository {
 			lista.add(jsonObjecto);
 		}
 		return lista;
-//		return jdbcTemplate.query("SELECT * from tbl_student", BeanPropertyRowMapper.newInstance(Student.class));
-//		return jdbcTemplate.query("SELECT * from tbl_student", (rs, rowNum) -> new Estudios(rs.getLong("student_id"),
-//				rs.getString("first_name"), rs.getString("last_name"), rs.getString("email_address")));
 	}
 
 	@Override
-	public Optional<Estudios> findById(Long id) {
+	public JsonObject findById(Long id) {
 		System.out.println("Buscar id-"+id);
 		Object[] parametros = {id};
-//	    return jdbcTemplate.queryForObject("select * FROM tbl_student WHERE student_id=?", 
-//	    		BeanPropertyRowMapper.newInstance(Student.class), id);
-//	    return jdbcTemplate.query("select * FROM tbl_student WHERE student_id=?", 
-//	    		BeanPropertyRowMapper.newInstance(Student.class), parametros).stream().findFirst();
-	    return jdbcTemplate.query("select * FROM tbl_student WHERE student_id=?", 
-	    		(rs, rowNum) -> new Estudios(rs.getLong("student_id"),
-	    				rs.getString("first_name"), rs.getString("last_name"), rs.getString("email_address")), parametros).stream().findFirst();
+	    return jdbcTemplate.query("select * FROM estudios WHERE estudioid=?", new JsonObjectRowMapper(), parametros).get(0);
 	}
 
 	@Override
-	public void save(Estudios student) {
-		System.out.println("Guardado \n"+student.toString());
-		Object[] parametros = {student.getEmail_address(), student.getFirstName(), student.getLastName()};
-		jdbcTemplate.update("INSERT INTO tbl_student ( email_address, first_name, last_name) VALUES(?,?,?)", parametros);
+	public void save(String estudio) {
+		System.out.println("Guardado \n"+estudio.toString());
+		JsonObject jsonEstudio = new Gson().fromJson(estudio, JsonObject.class);
+		
+		jsonEstudio.addProperty("estudioid", jdbcTemplate.queryForObject("SELECT nextval('estudios_estudioid_seq') as id;", Long.class));
+		Object[] parametros = {
+				jsonEstudio.get("estudioid").getAsString(), jsonEstudio.get("tipoestudioid").getAsString(), 
+				jsonEstudio.get("estudioactivo").getAsString(), jsonEstudio.get("estudionombre").getAsString(), 
+				jsonEstudio.get("estudiodescripcion").getAsString(), jsonEstudio.get("estudiofechacreacion").getAsString(), 
+				jsonEstudio.get("estudiofechamodificacion").getAsString(), jsonEstudio.get("bitacoraid").getAsString(), 
+				jsonEstudio.get("estudionombrecorto").getAsString(), jsonEstudio.get("estudiocosto").getAsString()};
+		jdbcTemplate.update("INSERT INTO estudios(\n"
+				+ "estudioid, tipoestudioid, estudioactivo, estudionombre, estudiodescripcion, estudiofechacreacion, estudiofechamodificacion, bitacoraid, estudionombrecorto, estudiocosto) "
+				+"VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, )", parametros);
 	}
 
 	@Override
 	public int deleteById(Long id) {
 		System.out.println("Eliminado id-"+id);
 		Object[] parametros = {id};
-	    return jdbcTemplate.update("DELETE FROM tbl_student WHERE student_id=?", parametros);
+	    return jdbcTemplate.update("DELETE FROM estudios WHERE estudioid=? and 1=2", parametros);
 	}
 	
 }

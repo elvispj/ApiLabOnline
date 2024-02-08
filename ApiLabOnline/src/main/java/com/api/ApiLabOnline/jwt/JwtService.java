@@ -1,6 +1,7 @@
 package com.api.ApiLabOnline.jwt;
 
 import java.security.Key;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,13 +26,12 @@ public class JwtService {
 	}
 
 	private String getToken(Map<String, Object> extraClaims, UserDetails user) {
-		
 		return Jwts
 				.builder()
 				.setClaims(extraClaims)
 				.setSubject(user.getUsername())
 				.setIssuedAt(new Date(System.currentTimeMillis()))
-				.setExpiration(new Date(System.currentTimeMillis()+1000*60*24))
+				.setExpiration(new Date(System.currentTimeMillis()+(1000*60*60*24)))
 				.signWith(getKey(), SignatureAlgorithm.HS256)
 				.setHeaderParam("Access-Control-Expose-Headers", "*")
 				.compact();
@@ -60,12 +60,6 @@ public class JwtService {
     	            .build()
     	            .parseClaimsJws(token)
     	            .getBody();
-//        return Jwts
-//                .parser()
-//                .setSigningKey(getKey())
-//                .build()
-//                .parseClaimsJws(token)
-//                .getBody();
     }
     
     private <T> T getClaims(String token, Function<Claims, T> claimResolver){

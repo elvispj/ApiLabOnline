@@ -24,6 +24,17 @@ public class OrdenesController {
 	@Autowired
 	private OrdenesService ordenesService;
 	
+	@PostMapping("/list")
+	public String getAllPDataTable(){
+		JsonObject response = new JsonObject();
+		JsonArray list = ordenesService.listOrdenes(10, 1);
+		response.addProperty("data", (list!=null ? list.toString() : "[]"));
+		response.addProperty("totalRecords", (list!=null ? list.size() : 0));
+		response.addProperty("filteredRecords", "");
+		System.out.println(response.toString());
+		return response.toString();
+	}
+	
 	@GetMapping("/list")
 	public String getAll(){
 		System.out.println("Si llego all ");

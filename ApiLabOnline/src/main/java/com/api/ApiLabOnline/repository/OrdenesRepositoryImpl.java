@@ -1,14 +1,9 @@
 package com.api.ApiLabOnline.repository;
 
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import com.api.ApiLabOnline.entity.Estudios;
@@ -34,6 +29,7 @@ public class OrdenesRepositoryImpl implements OrdenesRepository {
 		for(JsonObject jsonObjecto: listaJsonObject) {
 			lista.add(jsonObjecto);
 		}
+		System.out.println("tamanio de la lista "+lista.size());
 		return lista;
 	}
 

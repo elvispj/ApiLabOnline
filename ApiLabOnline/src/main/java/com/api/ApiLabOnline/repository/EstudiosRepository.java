@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import com.api.ApiLabOnline.entity.Estudios;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 public interface EstudiosRepository {
 
@@ -11,9 +12,9 @@ public interface EstudiosRepository {
 
 	JsonArray listEstudios(int limit, int offset);
 
-	Optional<Estudios> findById(Long id);
+	JsonObject findById(Long id);
 
-	void save(Estudios student);
+	void save(String student);
 
 	int deleteById(Long id);
 

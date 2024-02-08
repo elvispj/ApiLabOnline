@@ -1,14 +1,12 @@
 package com.api.ApiLabOnline.services;
 
-import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.api.ApiLabOnline.entity.Estudios;
 import com.api.ApiLabOnline.repository.EstudiosRepository;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 @Service
 public class EstudiosServices {
@@ -23,12 +21,13 @@ public class EstudiosServices {
 		return studentRepository.listEstudios(limit, offset);
 	}
 	
-	public Optional<Estudios> getEstudio(Long id) {
+	public JsonObject getEstudio(Long id) {
 		return studentRepository.findById(id);
 	}
 	
-	public void saveOrUpdate(Estudios estudios) {
+	public void saveOrUpdate(String estudios) {
 		studentRepository.save(estudios);
+		
 	}
 	
 	public int delete(Long id) {

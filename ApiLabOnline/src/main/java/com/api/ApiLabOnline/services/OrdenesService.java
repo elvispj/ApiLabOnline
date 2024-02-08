@@ -1,6 +1,5 @@
 package com.api.ApiLabOnline.services;
 
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -8,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.api.ApiLabOnline.repository.OrdenesRepository;
 import com.api.ApiLabOnline.repository.OrdenesdetalleRepository;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 @Service
@@ -30,11 +30,17 @@ public class OrdenesService {
 		JsonObject res = ordenesRepository.save(jsonOrden);
 		if(res!=null && res.get("ordenid")!=null 
 				&& res.get("ordenid").getAsInt()>0) {
-			if(ordenedetalleRepository.save(res.getAsString())!=null) {
-				return res;
+			JsonArray listaOrdenesDetalle=res.get("ordenesdetalle").getAsJsonArray();
+			if(listaOrdenesDetalle==null || listaOrdenesDetalle.size()<1) {
+				System.out.println("La lista de ordendetalle esta vacia");
+				return null;
 			}
+			for(JsonElement ordendetalle: listaOrdenesDetalle) {
+				ordenedetalleRepository.save(ordendetalle.getAsString());
+			}
+			return res;
 		}
-		return new JsonObject();
+		return null;
 	}
 
 	public int deleteById(Long id) {
