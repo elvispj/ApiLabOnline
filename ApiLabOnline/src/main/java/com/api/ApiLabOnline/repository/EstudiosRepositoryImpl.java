@@ -1,13 +1,12 @@
 package com.api.ApiLabOnline.repository;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import com.api.ApiLabOnline.entity.Estudios;
+import com.api.ApiLabOnline.utils.Utils;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -65,9 +64,23 @@ public class EstudiosRepositoryImpl implements EstudiosRepository {
 				jsonEstudio.get("estudiodescripcion").getAsString(), jsonEstudio.get("estudiofechacreacion").getAsString(), 
 				jsonEstudio.get("estudiofechamodificacion").getAsString(), jsonEstudio.get("bitacoraid").getAsString(), 
 				jsonEstudio.get("estudionombrecorto").getAsString(), jsonEstudio.get("estudiocosto").getAsString()};
-		jdbcTemplate.update("INSERT INTO estudios(\n"
+		jdbcTemplate.update("INSERT INTO estudios("
 				+ "estudioid, tipoestudioid, estudioactivo, estudionombre, estudiodescripcion, estudiofechacreacion, estudiofechamodificacion, bitacoraid, estudionombrecorto, estudiocosto) "
 				+"VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, )", parametros);
+	}
+
+	@Override
+	public void update(String estudio) {
+		System.out.println("Actualizando \n"+estudio.toString());
+		JsonObject jsonEstudio = new Gson().fromJson(estudio, JsonObject.class);
+		jsonEstudio.addProperty("estudiofechamodificacion", Utils.getFechaActual());
+		Object[] parametros = {
+				jsonEstudio.get("estudioactivo").getAsBoolean(), jsonEstudio.get("estudionombre").getAsString(), 
+				jsonEstudio.get("estudiodescripcion").getAsString(), jsonEstudio.get("estudionombrecorto").getAsString(), 
+				jsonEstudio.get("estudiocosto").getAsNumber(), jsonEstudio.get("estudiofechamodificacion").getAsString(), 				
+				jsonEstudio.get("estudioid").getAsInt()};
+		jdbcTemplate.update("update estudios set estudioactivo=?, estudionombre=?, estudiodescripcion=?, "
+				+"estudionombrecorto=?, estudiocosto=?, estudiofechamodificacion=cast(? as timestamp) where estudioid=?", parametros);
 	}
 
 	@Override

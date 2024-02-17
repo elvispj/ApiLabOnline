@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.api.ApiLabOnline.repository.EstudiosRepository;
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -26,7 +27,12 @@ public class EstudiosServices {
 	}
 	
 	public void saveOrUpdate(String estudios) {
-		studentRepository.save(estudios);
+		JsonObject estudio = new Gson().fromJson(estudios, JsonObject.class);
+		if(estudio.has("estudioid") && estudio.get("estudioid")!=null 
+				&& estudio.get("estudioid").getAsInt()>0)
+			studentRepository.update(estudios);
+		else
+			studentRepository.save(estudios);
 		
 	}
 	

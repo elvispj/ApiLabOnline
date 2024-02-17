@@ -16,6 +16,8 @@ public interface EstudiosRepository {
 
 	void save(String student);
 
+	void update(String estudio);
+
 	int deleteById(Long id);
 
 }

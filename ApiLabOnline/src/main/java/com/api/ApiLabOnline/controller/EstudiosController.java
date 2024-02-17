@@ -21,7 +21,7 @@ public class EstudiosController {
 	@Autowired
 	private EstudiosServices estudiosServices;
 	
-	@GetMapping("/all")
+	@PostMapping("/all")
 	public String getAll(){
 		JsonArray list = estudiosServices.getAll();
 		if(list!=null)
