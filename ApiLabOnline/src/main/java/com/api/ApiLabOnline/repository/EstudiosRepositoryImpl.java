@@ -58,6 +58,10 @@ public class EstudiosRepositoryImpl implements EstudiosRepository {
 		JsonObject jsonEstudio = new Gson().fromJson(estudio, JsonObject.class);
 		
 		jsonEstudio.addProperty("estudioid", jdbcTemplate.queryForObject("SELECT nextval('estudios_estudioid_seq') as id;", Long.class));
+		jsonEstudio.addProperty("estudioactivo", true);
+		jsonEstudio.addProperty("estudiofechacreacion", Utils.getFechaActual());
+		jsonEstudio.addProperty("estudiofechamodificacion", Utils.getFechaActual());
+		jsonEstudio.addProperty("bitacoraid", -1);
 		Object[] parametros = {
 				jsonEstudio.get("estudioid").getAsString(), jsonEstudio.get("tipoestudioid").getAsString(), 
 				jsonEstudio.get("estudioactivo").getAsString(), jsonEstudio.get("estudionombre").getAsString(), 
@@ -66,7 +70,7 @@ public class EstudiosRepositoryImpl implements EstudiosRepository {
 				jsonEstudio.get("estudionombrecorto").getAsString(), jsonEstudio.get("estudiocosto").getAsString()};
 		jdbcTemplate.update("INSERT INTO estudios("
 				+ "estudioid, tipoestudioid, estudioactivo, estudionombre, estudiodescripcion, estudiofechacreacion, estudiofechamodificacion, bitacoraid, estudionombrecorto, estudiocosto) "
-				+"VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, )", parametros);
+				+"VALUES(?, ?, ?, ?, ?, cast(? as timestamp), cast(? as timestamp), ?, ?, ? )", parametros);
 	}
 
 	@Override

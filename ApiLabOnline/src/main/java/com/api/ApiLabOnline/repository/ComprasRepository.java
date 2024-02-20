@@ -3,17 +3,17 @@ package com.api.ApiLabOnline.repository;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-public interface EstudiosRepository {
+public interface ComprasRepository {
 
 	JsonArray getAll();
 
-	JsonArray listEstudios(int limit, int offset);
+	JsonArray list(int limit, int offset);
 
 	JsonObject findById(Long id);
 
-	void save(String student);
+	void update(String compras);
 
-	void update(String estudio);
+	void save(String compras);
 
 	int deleteById(Long id);
 
