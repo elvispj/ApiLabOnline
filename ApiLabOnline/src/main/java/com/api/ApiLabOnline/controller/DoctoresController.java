@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.api.ApiLabOnline.services.DoctoresService;
-import com.api.ApiLabOnline.services.TipoestudiosService;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -44,18 +43,16 @@ public class DoctoresController {
 	}
 	
 	@GetMapping("/search/{doctorid}")
-	public String getById(@PathVariable("tipoestudioid") Long tipoestudioid){
-		log.info("Si llego byid "+tipoestudioid);
-		JsonObject orden =doctoresService.findById(tipoestudioid); 
+	public String getById(@PathVariable("doctorid") Long doctorid){
+		log.info("Search ById "+doctorid);
+		JsonObject orden =doctoresService.findById(doctorid); 
 		return new Gson().toJson(orden);
 	}
 	
 	@PostMapping("/save")
-	public String saveUpdate(@RequestBody String jsonTipoestudio){
-		log.info("Si llego save "+jsonTipoestudio);
-		JsonObject nuevaorden =doctoresService.save(jsonTipoestudio);
-		log.info("Nueva orden == "+nuevaorden.toString());
-		return new Gson().toJson(nuevaorden);
+	public String saveUpdate(@RequestBody String jsonDoctor){
+		log.info("Save "+jsonDoctor);
+		return new Gson().toJson(doctoresService.save(jsonDoctor));
 	}
 
 }

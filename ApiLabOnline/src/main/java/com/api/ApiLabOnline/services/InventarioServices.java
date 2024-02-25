@@ -16,6 +16,10 @@ public class InventarioServices {
 	public JsonArray getAll() {
 		return inventarioRepository.getAll();
 	}
+
+	public JsonArray getAllTipoProducto() {
+		return inventarioRepository.getAllTipoProducto();
+	}
 	
 	public JsonArray list(int limit, int offset){
 		return inventarioRepository.list(limit, offset);

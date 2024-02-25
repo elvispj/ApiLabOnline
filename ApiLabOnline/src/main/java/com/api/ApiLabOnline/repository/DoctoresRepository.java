@@ -11,6 +11,8 @@ public interface DoctoresRepository {
 
 	JsonObject findById(Long tipoestudioid);
 
+	JsonObject update(String jsonDoctor);
+
 	JsonObject save(String jsonTipoestudio);
 
 }

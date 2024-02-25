@@ -34,6 +34,25 @@ public class InventarioRepositoryImpl implements InventarioRepository {
 	}
 
 	@Override
+	public JsonArray getAllTipoProducto() {
+		System.out.println("Buscar por tipo producto");
+		JsonArray lista = new JsonArray();
+		List<JsonObject> listaJsonObject = jdbcTemplate.query(
+				"select i.*, p.tipoproductonombre, pr.proveedornombre "
+				+ "from inventario i "
+				+ "join tipoproducto p using(tipoproductoid) "
+				+ "join compras c using(compraid) "
+				+ "join proveedores pr using(proveedorid) "
+				+ "where i.inventarioactivo is true "
+				+ "order by 1 desc", 
+				new JsonObjectRowMapper());
+		for(JsonObject jsonObjecto: listaJsonObject) {
+			lista.add(jsonObjecto);
+		}
+		return lista;
+	}
+
+	@Override
 	public JsonArray list(int limit, int offset) {
 		System.out.println("Buscar todos limit["+limit+"] offset["+offset+"]");
 		JsonArray lista = new JsonArray();

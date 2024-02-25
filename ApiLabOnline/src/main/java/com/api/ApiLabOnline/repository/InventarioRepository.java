@@ -7,6 +7,8 @@ public interface InventarioRepository {
 
 	JsonArray getAll();
 
+	JsonArray getAllTipoProducto();
+
 	JsonArray list(int limit, int offset);
 
 	JsonObject findById(Long id);

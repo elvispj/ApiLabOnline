@@ -27,6 +27,14 @@ public class InventarioController {
 		return list.toString();
 	}
 	
+	@GetMapping("/allTipoProducto")
+	public String getAllTipoProducto(){
+		JsonArray list = inventarioServices.getAllTipoProducto();
+		if(list!=null)
+			System.out.println("Encontro "+list.size()+" inventario");
+		return list.toString();
+	}
+	
 	@GetMapping("/list")
 	public String list(@RequestParam("limit") int limit,@RequestParam("offset") int offset){
 //		return estudiosServices.listEstudios(10,0);
