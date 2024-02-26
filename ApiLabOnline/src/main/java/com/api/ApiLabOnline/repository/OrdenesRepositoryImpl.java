@@ -2,17 +2,20 @@ package com.api.ApiLabOnline.repository;
 
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import com.api.ApiLabOnline.entity.Estudios;
+import com.api.ApiLabOnline.utils.Utils;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 @Repository
 public class OrdenesRepositoryImpl implements OrdenesRepository {
+	private Logger log = LogManager.getLogger(OrdenesRepositoryImpl.class);
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
@@ -25,11 +28,10 @@ public class OrdenesRepositoryImpl implements OrdenesRepository {
 	public JsonArray listOrdenes(int limit, int offset) {
 		JsonArray lista = new JsonArray();
 		Object[] parameters = {limit, offset};
-		List<JsonObject> listaJsonObject = jdbcTemplate.query("select * from ordenes order by 1 desc limit ? offset ?", new JsonObjectRowMapper(), parameters);
+		List<JsonObject> listaJsonObject = jdbcTemplate.query("select * from ordenes where ordenactiva is true order by ordenfechacreacion limit ? offset ?", new JsonObjectRowMapper(), parameters);
 		for(JsonObject jsonObjecto: listaJsonObject) {
 			lista.add(jsonObjecto);
 		}
-		System.out.println("tamanio de la lista "+lista.size());
 		return lista;
 	}
 
@@ -39,7 +41,6 @@ public class OrdenesRepositoryImpl implements OrdenesRepository {
 		List<JsonObject> e = jdbcTemplate.query("select * FROM ordenes WHERE ordenid=?",new JsonObjectRowMapper(),id);
 		if(e!=null && e.size()>0) {
 			jsonObject = e.get(0).getAsJsonObject();
-			System.out.println(jsonObject.toString());
 		}
 		return jsonObject;
 	}
@@ -49,8 +50,10 @@ public class OrdenesRepositoryImpl implements OrdenesRepository {
 		JsonObject orden = new Gson().fromJson(jsonOrden, JsonObject.class);
 		
 		orden.addProperty("ordenid", jdbcTemplate.queryForObject("SELECT nextval('ordenes_orderid_seq') as id;", Long.class));
-		
-		System.out.println(orden.toString());
+		orden.addProperty("ordenactiva", true);
+		orden.addProperty("ordenfechacreacion", Utils.getFechaActual());
+		orden.addProperty("ordenfechamodificacion", Utils.getFechaActual());
+		orden.addProperty("bitacoraid", -1);
 
 		Object[] parametros = {orden.get("ordenid").getAsLong(), orden.get("ordenactiva").getAsBoolean(), orden.get("colaboradorid").getAsInt(), 
 				orden.get("clienteid").getAsInt(), orden.get("ordennombre").getAsString(), orden.get("ordenedad").getAsInt(), 
@@ -59,13 +62,14 @@ public class OrdenesRepositoryImpl implements OrdenesRepository {
 				orden.get("bitacoraid").getAsInt(), orden.get("ordenorigen").getAsString(), orden.get("ordencomentarios").getAsString(), 
 				orden.get("ordenimporte").getAsDouble(), orden.get("ordenimporteiva").getAsDouble(), orden.get("ordendescuento").getAsDouble(), 
 				orden.get("ordenimportedescuento").getAsDouble(), orden.get("ordenimportetotal").getAsDouble(), orden.get("ordencomoubico").getAsString(), 
-				orden.get("ordendatosclinicos").getAsString()};
+				orden.get("ordendatosclinicos").getAsString(), orden.get("ordenimportemaquila").getAsDouble(),
+				orden.get("ordensexo").getAsString(), orden.get("formapagoid").getAsString()};
 		jdbcTemplate.update("INSERT INTO ordenes(ordenid, ordenactiva, colaboradorid, clienteid, ordennombre, "
 				+"ordenedad, ordentelefono, ordendireccion, ordenformaentrega, ordenfechacreacion, ordenfechamodificacion, "
 				+"doctorid, bitacoraid, ordenorigen, ordencomentarios, ordenimporte, ordenimporteiva, ordendescuento, "
-				+"ordenimportedescuento, ordenimportetotal, ordencomoubico, ordendatosclinicos) "
-				+ "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, cast(? as timestamp), cast(? as timestamp), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", parametros);
-		System.out.println("Se registro exitosamente "+orden.get("ordenid").getAsLong());
+				+"ordenimportedescuento, ordenimportetotal, ordencomoubico, ordendatosclinicos, ordenimportemaquila, ordensexo, formapagoid) "
+				+ "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, cast(? as timestamp), cast(? as timestamp), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", parametros);
+		log.info("Se registro exitosamente "+orden.get("ordenid").getAsLong());
 		return orden;
 	}
 
@@ -75,36 +79,36 @@ public class OrdenesRepositoryImpl implements OrdenesRepository {
 		return 0;
 	}
 //	******************************************************
-	public List<Estudios> findAll() {
-		System.out.println("Buscar todos");
-//		return jdbcTemplate.query("SELECT * from tbl_student", BeanPropertyRowMapper.newInstance(Student.class));
-		return jdbcTemplate.query("SELECT * from tbl_student", (rs, rowNum) -> new Estudios(rs.getLong("student_id"),
-				rs.getString("first_name"), rs.getString("last_name"), rs.getString("email_address")));
-	}
-
-//	public Optional<Estudios> findById(Long id) {
-//		System.out.println("Buscar id-"+id);
-//		Object[] parametros = {id};
-////	    return jdbcTemplate.queryForObject("select * FROM tbl_student WHERE student_id=?", 
-////	    		BeanPropertyRowMapper.newInstance(Student.class), id);
-////	    return jdbcTemplate.query("select * FROM tbl_student WHERE student_id=?", 
-////	    		BeanPropertyRowMapper.newInstance(Student.class), parametros).stream().findFirst();
-//	    return jdbcTemplate.query("select * FROM tbl_student WHERE student_id=?", 
-//	    		(rs, rowNum) -> new Estudios(rs.getLong("student_id"),
-//	    				rs.getString("first_name"), rs.getString("last_name"), rs.getString("email_address")), parametros).stream().findFirst();
+//	public List<Estudios> findAll() {
+//		log.info("Buscar todos");
+////		return jdbcTemplate.query("SELECT * from tbl_student", BeanPropertyRowMapper.newInstance(Student.class));
+//		return jdbcTemplate.query("SELECT * from tbl_student", (rs, rowNum) -> new Estudios(rs.getLong("student_id"),
+//				rs.getString("first_name"), rs.getString("last_name"), rs.getString("email_address")));
 //	}
-
-	public void save(Estudios student) {
-		System.out.println("Guardado \n"+student.toString());
-		Object[] parametros = {student.getEmail_address(), student.getFirstName(), student.getLastName()};
-		jdbcTemplate.update("INSERT INTO tbl_student ( email_address, first_name, last_name) VALUES(?,?,?)", parametros);
-	}
-
-	public int deleteByIdd(Long id) {
-		System.out.println("Eliminado id-"+id);
-		Object[] parametros = {id};
-	    return jdbcTemplate.update("DELETE FROM tbl_student WHERE student_id=?", parametros);
-	}
+//
+////	public Optional<Estudios> findById(Long id) {
+////		System.out.println("Buscar id-"+id);
+////		Object[] parametros = {id};
+//////	    return jdbcTemplate.queryForObject("select * FROM tbl_student WHERE student_id=?", 
+//////	    		BeanPropertyRowMapper.newInstance(Student.class), id);
+//////	    return jdbcTemplate.query("select * FROM tbl_student WHERE student_id=?", 
+//////	    		BeanPropertyRowMapper.newInstance(Student.class), parametros).stream().findFirst();
+////	    return jdbcTemplate.query("select * FROM tbl_student WHERE student_id=?", 
+////	    		(rs, rowNum) -> new Estudios(rs.getLong("student_id"),
+////	    				rs.getString("first_name"), rs.getString("last_name"), rs.getString("email_address")), parametros).stream().findFirst();
+////	}
+//
+//	public void save(Estudios student) {
+//		System.out.println("Guardado \n"+student.toString());
+//		Object[] parametros = {student.getEmail_address(), student.getFirstName(), student.getLastName()};
+//		jdbcTemplate.update("INSERT INTO tbl_student ( email_address, first_name, last_name) VALUES(?,?,?)", parametros);
+//	}
+//
+//	public int deleteByIdd(Long id) {
+//		System.out.println("Eliminado id-"+id);
+//		Object[] parametros = {id};
+//	    return jdbcTemplate.update("DELETE FROM tbl_student WHERE student_id=?", parametros);
+//	}
 	
 	
 	
