@@ -67,12 +67,12 @@ public class OrdenesdetalleRepositoryImpl implements OrdenesdetalleRepository {
 
 		Object[] parametros = {ordendetalle.get("ordendetalleid").getAsLong(), ordendetalle.get("ordenid").getAsLong(), ordendetalle.get("estudioid").getAsLong(), 
 				ordendetalle.get("ordendetalleactivo").getAsBoolean(), ordendetalle.get("ordendetallecosto").getAsDouble(), 
-				ordendetalle.get("ordendetalledescuento").getAsDouble(), ordendetalle.get("ordendetallecostofinal").getAsDouble(), 
-				ordendetalle.get("ordendetallefechacreacion").getAsString(), ordendetalle.get("ordendetallefechamodificacion").getAsString(), 
-				ordendetalle.get("bitacoraid").getAsInt()};
+				ordendetalle.get("ordendetalledescuento").getAsDouble(), ordendetalle.get("ordendetalleimportedescuento").getAsDouble(),
+				ordendetalle.get("ordendetallecostofinal").getAsDouble(), ordendetalle.get("ordendetallefechacreacion").getAsString(), 
+				ordendetalle.get("ordendetallefechamodificacion").getAsString(), ordendetalle.get("bitacoraid").getAsInt()};
 		jdbcTemplate.update("insert into ordendetalle(ordendetalleid,ordenid,estudioid,ordendetalleactivo,ordendetallecosto,"
-				+"ordendetalledescuento,ordendetallecostofinal,ordendetallefechacreacion,ordendetallefechamodificacion,bitacoraid) "
-				+ "VALUES(?, ?, ?, ?, ?, ?, ?, cast(? as timestamp), cast(? as timestamp), ?);", parametros);
+				+"ordendetalledescuento,ordendetalleimportedescuento,ordendetallecostofinal,ordendetallefechacreacion,ordendetallefechamodificacion,bitacoraid) "
+				+ "VALUES(?, ?, ?, ?, ?, ?, ?, ?, cast(? as timestamp), cast(? as timestamp), ?);", parametros);
 		log.info("Se registro exitosamente "+ordendetalle.get("ordendetalleid").getAsLong());
 		return ordendetalle;
 	}

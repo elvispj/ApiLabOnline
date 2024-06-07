@@ -38,10 +38,28 @@ public class OrdenesRepositoryImpl implements OrdenesRepository {
 	@Override
 	public JsonObject findById(Long id) {
 		JsonObject jsonObject = new JsonObject();
-		List<JsonObject> e = jdbcTemplate.query("select * FROM ordenes WHERE ordenid=?",new JsonObjectRowMapper(),id);
-		if(e!=null && e.size()>0) {
-			jsonObject = e.get(0).getAsJsonObject();
+		JsonArray ordendetalle = new JsonArray();
+		List<JsonObject> listResponse = jdbcTemplate.query("select * FROM ordenes WHERE ordenid=?",new JsonObjectRowMapper(),id);
+		if(listResponse==null || listResponse.size()<1) {
+			return jsonObject;
 		}
+		jsonObject = listResponse.get(0).getAsJsonObject();
+		
+		listResponse = jdbcTemplate.query("select * FROM doctores WHERE doctorid=?",new JsonObjectRowMapper(),jsonObject.get("doctorid").getAsInt());
+		if(listResponse!=null && listResponse.size()>0) {
+			jsonObject.add("doctor", listResponse.get(0).getAsJsonObject());
+		}
+		
+		listResponse = jdbcTemplate.query("select * FROM clientes WHERE clienteid=?",new JsonObjectRowMapper(),jsonObject.get("clienteid").getAsInt());
+		if(listResponse!=null && listResponse.size()>0) {
+			jsonObject.add("cliente", listResponse.get(0).getAsJsonObject());
+		}
+
+		listResponse = jdbcTemplate.query("select o.*,e.estudionombre from ordendetalle o join estudios e using(estudioid) where ordenid=? order by 1", new JsonObjectRowMapper(), jsonObject.get("ordenid").getAsInt());
+		for(JsonObject jsonObjecto: listResponse) {
+			ordendetalle.add(jsonObjecto);
+		}
+		jsonObject.add("ordenesdetalle", ordendetalle);
 		return jsonObject;
 	}
 
@@ -62,13 +80,14 @@ public class OrdenesRepositoryImpl implements OrdenesRepository {
 				orden.get("bitacoraid").getAsInt(), orden.get("ordenorigen").getAsString(), orden.get("ordencomentarios").getAsString(), 
 				orden.get("ordenimporte").getAsDouble(), orden.get("ordenimporteiva").getAsDouble(), orden.get("ordendescuento").getAsDouble(), 
 				orden.get("ordenimportedescuento").getAsDouble(), orden.get("ordenimportetotal").getAsDouble(), orden.get("ordencomoubico").getAsString(), 
-				orden.get("ordendatosclinicos").getAsString(), orden.get("ordenimportemaquila").getAsDouble(),
-				orden.get("ordensexo").getAsString(), orden.get("formapagoid").getAsString()};
+				orden.get("ordendatosclinicos").getAsString(), orden.get("ordenimportemaquila").getAsDouble(), orden.get("ordensexo").getAsString(), 
+				orden.get("formapagoid").getAsString(), orden.get("ordenimporteotrocobro").getAsDouble()};
 		jdbcTemplate.update("INSERT INTO ordenes(ordenid, ordenactiva, colaboradorid, clienteid, ordennombre, "
 				+"ordenedad, ordentelefono, ordendireccion, ordenformaentrega, ordenfechacreacion, ordenfechamodificacion, "
 				+"doctorid, bitacoraid, ordenorigen, ordencomentarios, ordenimporte, ordenimporteiva, ordendescuento, "
-				+"ordenimportedescuento, ordenimportetotal, ordencomoubico, ordendatosclinicos, ordenimportemaquila, ordensexo, formapagoid) "
-				+ "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, cast(? as timestamp), cast(? as timestamp), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", parametros);
+				+"ordenimportedescuento, ordenimportetotal, ordencomoubico, ordendatosclinicos, ordenimportemaquila, "
+				+"ordensexo, formapagoid, ordenimporteotrocobro) "
+				+ "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, cast(? as timestamp), cast(? as timestamp), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", parametros);
 		log.info("Se registro exitosamente "+orden.get("ordenid").getAsLong());
 		return orden;
 	}

@@ -56,4 +56,12 @@ public class OrdenesController {
 		System.out.println("Nueva orden == "+nuevaorden.toString());
 		return new Gson().toJson(nuevaorden);
 	}
+	
+	@PostMapping("/saveOrden")
+	public String saveUpdateOrden(@RequestBody String jsonOrden){
+		System.out.println("Si llego save "+jsonOrden);
+		JsonObject nuevaorden =ordenesService.saveOrden(jsonOrden);
+		System.out.println("Nueva orden == "+nuevaorden.toString());
+		return new Gson().toJson(nuevaorden);
+	}
 }
