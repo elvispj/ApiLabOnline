@@ -27,4 +27,9 @@ public class AuthController {
 	public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
 		return ResponseEntity.ok(authService.register(request));
 	}
+	
+	@PostMapping("update")
+	public ResponseEntity<AuthResponse> update(@RequestBody ChangeRequest request) {
+		return ResponseEntity.ok(authService.update(request));
+	}
 }

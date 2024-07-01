@@ -1,5 +1,7 @@
 package com.api.ApiLabOnline.Auth;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,28 +28,54 @@ public class AuthService {
 	private PasswordEncoder passwordEncoder;
 	@Autowired
 	private AuthenticationManager authenticationManager; 
+	
+	private Logger log = LogManager.getLogger(this.getClass());
 
 	public AuthResponse login(LoginRequest request) {
-		System.out.println("Login "+request.toString());
+		log.info("Login "+request.toString());
 		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
-		UserDetails user =userRepository.findByUsername(request.getUsername()).orElseThrow(() -> new UsernameNotFoundException("No se encontro el usuario."));
+		User user =userRepository.findByUsername(request.getUsername()).orElseThrow(() -> new UsernameNotFoundException("No se encontro el usuario."));
+		
+		System.out.println("Recupero "+user.toString());
+		
 		String token = jwtService.getToken(user);
-		return AuthResponse.builder()
+		AuthResponse res = AuthResponse.builder()
+				.id(user.getId())
+				.username(user.getUsername())
+				.firstname(user.getFirstname())
+				.lastname(user.getLastname())
+				.country(user.getCountry())
+				.role(user.getRole())
 				.token(token)
+				.build();
+		log.info("Get User >> "+user.toString());
+		return res;
+	}
+
+	public AuthResponse update(ChangeRequest request) {
+		log.info("Update "+request.toString());
+		User user =userRepository.findByUsername(request.getUsername()).orElseThrow(() -> new UsernameNotFoundException("No se encontro el usuario."));
+		user.setPassword(passwordEncoder.encode(request.getPasswordnew()));
+		log.info("Update >> "+user.toString());
+		
+		userRepository.save(user);
+		
+		return AuthResponse.builder()
+				.token(jwtService.getToken(user))
 				.build();
 	}
 
 	public AuthResponse register(RegisterRequest request) {
-		System.out.println("Register "+request.toString());
+		log.info("Register "+request.toString());
 		User user = User.builder()
 				.username(request.getUsername())
 				.password(passwordEncoder.encode(request.getPassword()))
 				.firstname(request.getFirstname())
 				.lastname(request.getLastname())
 				.country(request.getCountry())
-				.role(Role.USER)
+				.role(request.getRole())
 				.build();
-		System.out.println("Usuario nuevo "+user.toString());
+		log.info("Save >> "+user.toString());
 		
 		userRepository.save(user);
 		

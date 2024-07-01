@@ -1,7 +1,5 @@
 package com.api.ApiLabOnline.Auth;
 
-import com.api.ApiLabOnline.jwt.Role;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,11 +9,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegisterRequest {
+public class ChangeRequest {
 	String username;
 	String password;
-	String firstname;
-	String lastname;
-	String country;
-	Role role;
+	String passwordnew;
+	String passwordnewconfirm;
+
 }
