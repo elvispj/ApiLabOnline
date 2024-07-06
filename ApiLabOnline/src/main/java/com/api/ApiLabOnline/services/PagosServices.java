@@ -3,8 +3,6 @@ package com.api.ApiLabOnline.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.api.ApiLabOnline.repository.MovimientosCajaRepository;
-import com.api.ApiLabOnline.repository.PagosDetalleRepository;
 import com.api.ApiLabOnline.repository.PagosRepository;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -16,9 +14,9 @@ public class PagosServices {
 	@Autowired
 	PagosRepository pagosRepository;
 	@Autowired
-	PagosDetalleRepository pagodetalleRepository;
+	MovimientosCajaService movimientosCajaService;
 	@Autowired
-	MovimientosCajaRepository movimientosCajaRepository;
+	PagoDetalleServices pagoDetalleServices;
 
 	public JsonArray getAll() {
 		return pagosRepository.getAll();
@@ -30,6 +28,12 @@ public class PagosServices {
 	
 	public JsonObject getById(Long id) {
 		return pagosRepository.findById(id);
+	}
+
+	public JsonObject getPagoByOrdenId(Long ordenid) {
+		JsonObject pago = pagosRepository.getPagoByOrdenId(ordenid);
+		pago.add("pagodetalle", pagoDetalleServices.findByPagoId(pago.get("pagoid").getAsLong()));
+		return pago;
 	}
 	
 	public void saveOrUpdate(String pago) {
@@ -44,11 +48,11 @@ public class PagosServices {
 				for(int i=0; i<listaPagosDetalle.size(); i++) {
 					JsonObject detallepago = listaPagosDetalle.get(i).getAsJsonObject();
 					System.out.println(">>> "+detallepago.get("movimientoscaja"));
-					JsonObject movimientoscaja = movimientosCajaRepository.save(new Gson().toJson(detallepago.get("movimientoscaja")));
+					JsonObject movimientoscaja = movimientosCajaService.save(new Gson().toJson(detallepago.get("movimientoscaja")));
 					movimientoscaja.addProperty("movimientocomentarios", "Se agrega pago por orden de estudio ID-"+jsonPagos.get("ordenid").getAsInt());
 					detallepago.addProperty("pagoid", jsonPagos.get("pagoid").getAsInt());
 					detallepago.addProperty("movimientocajaid", movimientoscaja.get("movimientoid").getAsInt());
-					pagodetalleRepository.save(new Gson().toJson(detallepago));
+					pagoDetalleServices.save(new Gson().toJson(detallepago));
 				}
 			}
 		}

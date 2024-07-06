@@ -41,7 +41,8 @@ public class PagosDetalleRepositoryImpl implements PagosDetalleRepository {
 		log.info("Buscar todos limit["+limit+"] offset["+offset+"]");
 		JsonArray lista = new JsonArray();
 		Object[] parameters = {limit, offset};
-		List<JsonObject> listaJsonObject = jdbcTemplate.query("select * from pagodetalle where pagodetalleactivo is true order by 1 desc limit ? offset ?", new JsonObjectRowMapper(), parameters);
+		List<JsonObject> listaJsonObject = jdbcTemplate.query("select * from pagodetalle where pagodetalleactivo is true order by 1 desc limit ? offset ?", 
+				new JsonObjectRowMapper(), parameters);
 		for(JsonObject jsonObjecto: listaJsonObject) {
 			lista.add(jsonObjecto);
 		}
@@ -49,11 +50,23 @@ public class PagosDetalleRepositoryImpl implements PagosDetalleRepository {
 	}
 
 	@Override
+	public JsonArray findByPagoId(Long pagoid) {
+		log.info("Buscar pagoid-"+pagoid);
+		Object[] parametros = {pagoid};
+		JsonArray lista = new JsonArray();
+		List<JsonObject> listaDetalle = jdbcTemplate.query("select * FROM pagodetalle WHERE pagodetalleactivo is true and pagoid=? order by pagodetalleid", 
+				new JsonObjectRowMapper(), parametros);
+		for(JsonObject jsonObjecto: listaDetalle) {
+			lista.add(jsonObjecto);
+		}
+	    return lista;
+	}
+
+	@Override
 	public JsonObject findById(Long id) {
-	
 		log.info("Buscar id-"+id);
 		Object[] parametros = {id};
-	    return jdbcTemplate.query("select * FROM pagodetalle WHERE compraid=?", new JsonObjectRowMapper(), parametros).get(0);
+	    return jdbcTemplate.query("select * FROM pagodetalle WHERE pagodetalleid=?", new JsonObjectRowMapper(), parametros).get(0);
 	}
 
 	@Override
@@ -69,7 +82,7 @@ public class PagosDetalleRepositoryImpl implements PagosDetalleRepository {
 	}
 
 	@Override
-	public void save(String pagodetalle) {
+	public JsonObject save(String pagodetalle) {
 		log.info("Guardado \n"+pagodetalle.toString());
 		JsonObject jsonPagoDetalle = new Gson().fromJson(pagodetalle, JsonObject.class);
 		
@@ -86,6 +99,7 @@ public class PagosDetalleRepositoryImpl implements PagosDetalleRepository {
 		jdbcTemplate.update("INSERT INTO pagodetalle(pagodetalleid,pagoid,movimientocajaid,pagodetalleactivo,"
 				+"pagodetalleimporte,pagodetallefechacreacion,pagodetallefechamodificacion,bitacoraid) "
 				+"VALUES(?, ?, ?, ?, ?, cast(? as timestamp), cast(? as timestamp), ?)", parametros);
+		return jsonPagoDetalle;
 	}
 
 	@Override

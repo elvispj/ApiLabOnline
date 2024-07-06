@@ -17,4 +17,6 @@ public interface PagosRepository {
 
 	int deleteById(Long id);
 
+	JsonObject getPagoByOrdenId(Long ordenid);
+
 }

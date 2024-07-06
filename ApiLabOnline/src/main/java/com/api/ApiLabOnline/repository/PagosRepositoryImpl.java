@@ -57,6 +57,13 @@ public class PagosRepositoryImpl implements PagosRepository {
 	}
 
 	@Override
+	public JsonObject getPagoByOrdenId(Long ordenid) {
+		log.info("Buscar ordenid-"+ordenid);
+		Object[] parametros = {ordenid};
+	    return jdbcTemplate.query("select * from pagos where ordenid=?", new JsonObjectRowMapper(), parametros).get(0);
+	}
+
+	@Override
 	public JsonObject update(String pagos) {
 		log.info("Actualizando \n"+pagos.toString());
 		JsonObject jsonPagos = new Gson().fromJson(pagos, JsonObject.class);

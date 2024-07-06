@@ -9,11 +9,13 @@ public interface PagosDetalleRepository {
 
 	JsonArray list(int limit, int offset);
 
+	JsonArray findByPagoId(Long pagoid);
+
 	JsonObject findById(Long id);
 
 	void update(String compras);
 
-	void save(String compras);
+	JsonObject save(String compras);
 
 	int deleteById(Long id);
 

@@ -28,6 +28,11 @@ public class PagosController {
 		return pagosServices.list(limit, offset).toString();
 	}
 	
+	@GetMapping("/search/orden/{ordenid}")
+	public String getPagoByOrdenId(@PathVariable("ordenid") Long ordenid){
+		return pagosServices.getPagoByOrdenId(ordenid).toString();
+	}
+	
 	@GetMapping("/search/{pagoid}")
 	public String getById(@PathVariable("pagoid") Long pagoid){
 		return pagosServices.getById(pagoid).toString();
