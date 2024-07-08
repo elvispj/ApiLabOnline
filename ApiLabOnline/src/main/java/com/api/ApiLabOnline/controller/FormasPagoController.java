@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.api.ApiLabOnline.services.FormasPagoServices;
-import com.google.gson.JsonArray;
+import com.google.gson.Gson;
 
 @RestController
 @RequestMapping(path="api/v1/formaspago")
@@ -20,21 +20,17 @@ public class FormasPagoController {
 	
 	@GetMapping("/all")
 	public String getAll(){
-		JsonArray list = formasPagoServices.getAll();
-		if(list!=null)
-			System.out.println("Encontro "+list.size()+" formas pago");
-		return list.toString();
+		return new Gson().toJson(formasPagoServices.getAll());
 	}
 	
 	@GetMapping("/search/{tipoproductoid}")
 	public String getById(@PathVariable("tipoproductoid") String formapagoid){
-		return formasPagoServices.getById(formapagoid).toString();
+		return new Gson().toJson(formasPagoServices.getById(formapagoid));
 	}
 	
 	@PostMapping("/save")
 	public String saveUpdate(@RequestBody String formapago){
-		formasPagoServices.saveOrUpdate(formapago);
-		return formapago;
+		return new Gson().toJson(formasPagoServices.saveOrUpdate(formapago));
 	}
 	
 	@DeleteMapping("/delete/{formapagoid}")

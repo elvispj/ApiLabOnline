@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -47,12 +48,12 @@ public class OrdenesdetalleRepositoryImpl implements OrdenesdetalleRepository {
 
 	@Override
 	public JsonObject findById(Long ordendetalleid) {
-		JsonObject jsonObject = new JsonObject();
-		List<JsonObject> e = jdbcTemplate.query("select * FROM ordendetalle WHERE ordendetalleid=?",new JsonObjectRowMapper(), ordendetalleid);
-		if(e!=null && e.size()>0) {
-			jsonObject = e.get(0).getAsJsonObject();
-		}
-		return jsonObject;
+		try {
+			return jdbcTemplate.queryForObject("select * FROM ordendetalle WHERE ordendetalleid=?",new JsonObjectRowMapper(), ordendetalleid);
+	    } catch (EmptyResultDataAccessException e) {
+	    	log.info("NO encontro informacion");
+	        return null;
+	    }
 	}
 
 	@Override

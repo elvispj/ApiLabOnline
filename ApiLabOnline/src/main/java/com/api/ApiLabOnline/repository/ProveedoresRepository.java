@@ -11,9 +11,9 @@ public interface ProveedoresRepository {
 
 	JsonObject findById(Long id);
 
-	void update(String proveedor);
+	JsonObject update(String proveedor);
 
-	void save(String proveedor);
+	JsonObject save(String proveedor);
 
 	int deleteById(Long id);
 

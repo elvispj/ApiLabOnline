@@ -2,6 +2,7 @@ package com.api.ApiLabOnline.repository;
 
 import java.util.List;
 
+import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -13,6 +14,7 @@ import com.google.gson.JsonObject;
 
 @Repository
 public class InventarioRepositoryImpl implements InventarioRepository {
+	private Logger log = Logger.getLogger(this.getClass());
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
@@ -23,7 +25,7 @@ public class InventarioRepositoryImpl implements InventarioRepository {
 
 	@Override
 	public JsonArray getAll() {
-		System.out.println("Buscar todos");
+		log.debug("Buscar todos");
 		JsonArray lista = new JsonArray();
 		List<JsonObject> listaJsonObject = jdbcTemplate.query("select * from inventario where inventarioactivo is true order by 1 desc", 
 				new JsonObjectRowMapper());
@@ -35,7 +37,7 @@ public class InventarioRepositoryImpl implements InventarioRepository {
 
 	@Override
 	public JsonArray getAllTipoProducto() {
-		System.out.println("Buscar por tipo producto");
+		log.debug("Buscar por tipo producto");
 		JsonArray lista = new JsonArray();
 		List<JsonObject> listaJsonObject = jdbcTemplate.query(
 				"select i.*, p.tipoproductonombre, pr.proveedornombre "
@@ -54,7 +56,7 @@ public class InventarioRepositoryImpl implements InventarioRepository {
 
 	@Override
 	public JsonArray list(int limit, int offset) {
-		System.out.println("Buscar todos limit["+limit+"] offset["+offset+"]");
+		log.debug("Buscar todos limit["+limit+"] offset["+offset+"]");
 		JsonArray lista = new JsonArray();
 		Object[] parameters = {limit, offset};
 		List<JsonObject> listaJsonObject = jdbcTemplate.query("select * from inventario where inventarioactivo is true order by 1 desc limit ? offset ?", new JsonObjectRowMapper(), parameters);
@@ -66,14 +68,14 @@ public class InventarioRepositoryImpl implements InventarioRepository {
 
 	@Override
 	public JsonObject findById(Long id) {
-		System.out.println("Buscar id-"+id);
+		log.debug("Buscar id-"+id);
 		Object[] parametros = {id};
 	    return jdbcTemplate.query("select * FROM inventario WHERE inventarioid=?", new JsonObjectRowMapper(), parametros).get(0);
 	}
 
 	@Override
-	public void update(String inventario) {
-		System.out.println("Actualizando \n"+inventario.toString());
+	public JsonObject update(String inventario) {
+		log.debug("Actualizando \n"+inventario.toString());
 		JsonObject jsonInventario = new Gson().fromJson(inventario, JsonObject.class);
 		jsonInventario.addProperty("inventariofechamodificacion", Utils.getFechaActual());
 		Object[] parametros = {
@@ -84,11 +86,13 @@ public class InventarioRepositoryImpl implements InventarioRepository {
 		jdbcTemplate.update("update inventario set inventarioactivo=?, inventariounidad=?, inventariocostoporunidad=?, "
 				+"inventariocantidadoriginal=?, inventariocantidadactual=?, inventarioimagen=?, "
 				+"inventariofechamodificacion=cast(? as timestamp) where inventarioid=?", parametros);
+		
+		return jsonInventario;
 	}
 
 	@Override
-	public void save(String inventario) {
-		System.out.println("Guardado \n"+inventario.toString());
+	public JsonObject save(String inventario) {
+		log.debug("Guardado \n"+inventario.toString());
 		JsonObject jsonInventario = new Gson().fromJson(inventario, JsonObject.class);
 		
 		jsonInventario.addProperty("inventarioid", jdbcTemplate.queryForObject("SELECT nextval('inventario_inventarioid_seq') as id;", Long.class));
@@ -106,6 +110,8 @@ public class InventarioRepositoryImpl implements InventarioRepository {
 		jdbcTemplate.update("INSERT INTO inventario(inventarioid,compraid,tipoproductoid,inventarioactivo,inventariounidad,inventariocostoporunidad,"
 				+"inventariocantidadoriginal,inventariocantidadactual,inventarioimagen,inventariofechacreacion,inventariofechamodificacion) "
 				+"VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, cast(? as timestamp), cast(? as timestamp))", parametros);
+		
+		return jsonInventario;
 	}
 
 	@Override

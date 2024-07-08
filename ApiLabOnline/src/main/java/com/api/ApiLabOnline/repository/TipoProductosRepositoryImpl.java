@@ -2,7 +2,9 @@ package com.api.ApiLabOnline.repository;
 
 import java.util.List;
 
+import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -13,6 +15,7 @@ import com.google.gson.JsonObject;
 
 @Repository
 public class TipoProductosRepositoryImpl implements TipoProductosRepository {
+	private Logger log = Logger.getLogger(this.getClass());
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
@@ -23,7 +26,7 @@ public class TipoProductosRepositoryImpl implements TipoProductosRepository {
 
 	@Override
 	public JsonArray getAll() {
-		System.out.println("Buscar todos");
+		log.debug("Buscar todos");
 		JsonArray lista = new JsonArray();
 		List<JsonObject> listaJsonObject = jdbcTemplate.query("select * from tipoproducto where tipoproductoactivo is true order by 1 desc", 
 				new JsonObjectRowMapper());
@@ -35,7 +38,7 @@ public class TipoProductosRepositoryImpl implements TipoProductosRepository {
 
 	@Override
 	public JsonArray list(int limit, int offset) {
-		System.out.println("Buscar todos limit["+limit+"] offset["+offset+"]");
+		log.debug("Buscar todos limit["+limit+"] offset["+offset+"]");
 		JsonArray lista = new JsonArray();
 		Object[] parameters = {limit, offset};
 		List<JsonObject> listaJsonObject = jdbcTemplate.query("select * from tipoproducto where tipoproductoactivo is true order by 1 desc limit ? offset ?", new JsonObjectRowMapper(), parameters);
@@ -47,14 +50,18 @@ public class TipoProductosRepositoryImpl implements TipoProductosRepository {
 
 	@Override
 	public JsonObject findById(Long id) {
-		System.out.println("Buscar id-"+id);
-		Object[] parametros = {id};
-	    return jdbcTemplate.query("select * FROM tipoproducto WHERE tipoproductoid=?", new JsonObjectRowMapper(), parametros).get(0);
+		log.debug("Buscar id-"+id);
+		try {
+			return jdbcTemplate.queryForObject("select * FROM tipoproducto WHERE tipoproductoid=?", new JsonObjectRowMapper(), id);
+	    } catch (EmptyResultDataAccessException e) {
+	    	log.info("NO encontro informacion");
+	        return null;
+	    }
 	}
 
 	@Override
-	public void update(String tipoproducto) {
-		System.out.println("Actualizando \n"+tipoproducto.toString());
+	public JsonObject update(String tipoproducto) {
+		log.debug("Actualizando \n"+tipoproducto.toString());
 		JsonObject jsonTipoProducto = new Gson().fromJson(tipoproducto, JsonObject.class);
 		jsonTipoProducto.addProperty("tipoproductofechamodificacion", Utils.getFechaActual());
 		Object[] parametros = {
@@ -63,11 +70,13 @@ public class TipoProductosRepositoryImpl implements TipoProductosRepository {
 				jsonTipoProducto.get("tipoproductoid").getAsInt()};
 		jdbcTemplate.update("update tipoproducto set tipoproductoactivo=?, tipoproductonombre=?, "
 				+"tipoproductodescripcion=?, tipoproductofechamodificacion=cast(? as timestamp) where tipoproductoid=?", parametros);
+		
+		return jsonTipoProducto;
 	}
 
 	@Override
-	public void save(String tipoproducto) {
-		System.out.println("Guardado \n"+tipoproducto.toString());
+	public JsonObject save(String tipoproducto) {
+		log.debug("Guardado \n"+tipoproducto.toString());
 		JsonObject jsonTipoProducto = new Gson().fromJson(tipoproducto, JsonObject.class);
 		
 		jsonTipoProducto.addProperty("tipoproductoid", jdbcTemplate.queryForObject("SELECT nextval('tipoproducto_tipoproductoid_seq') as id;", Long.class));
@@ -83,6 +92,8 @@ public class TipoProductosRepositoryImpl implements TipoProductosRepository {
 		jdbcTemplate.update("INSERT INTO tipoproducto(tipoproductoid,tipoproductoactivo,tipoproductonombre,"
 				+"tipoproductodescripcion,tipoproductofechacreacion,tipoproductofechamodificacion,bitacoraid) "
 				+"VALUES(?, ?, ?, ?, cast(? as timestamp), cast(? as timestamp), ?)", parametros);
+		
+		return jsonTipoProducto;
 	}
 
 	@Override

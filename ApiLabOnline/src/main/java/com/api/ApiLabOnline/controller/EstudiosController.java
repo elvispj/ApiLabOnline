@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.api.ApiLabOnline.services.EstudiosServices;
-import com.google.gson.JsonArray;
+import com.google.gson.Gson;
 
 @RestController
 @RequestMapping(path="api/v1/estudios")
@@ -23,31 +23,22 @@ public class EstudiosController {
 	
 	@PostMapping("/all")
 	public String getAll(){
-		JsonArray list = estudiosServices.getAll();
-		if(list!=null)
-			System.out.println("Encontro "+list.size()+" estudios");
-		return list.toString();
+		return new Gson().toJson(estudiosServices.getAll());
 	}
 	
 	@GetMapping("/list")
 	public String listEstudios(@RequestParam("limit") int limit,@RequestParam("offset") int offset){
-//		return estudiosServices.listEstudios(10,0);
-		System.out.println("Si llego all limit["+limit+"] offset["+offset+"]");
-		JsonArray list = estudiosServices.listEstudios(limit, offset);
-		if(list!=null)
-			System.out.println("Encontro "+list.size()+" estudios");
-		return list.toString();
+		return new Gson().toJson(estudiosServices.listEstudios(limit, offset));
 	}
 	
 	@GetMapping("/search/{estudioid}")
 	public String getById(@PathVariable("estudioid") Long estudioid){
-		return estudiosServices.getEstudio(estudioid).toString();
+		return new Gson().toJson(estudiosServices.getEstudio(estudioid));
 	}
 	
 	@PostMapping("/save")
 	public String saveUpdate(@RequestBody String estudio){
-		estudiosServices.saveOrUpdate(estudio);
-		return estudio;
+		return new Gson().toJson(estudiosServices.saveOrUpdate(estudio));
 	}
 	
 	@DeleteMapping("/delete/{estudioid}")

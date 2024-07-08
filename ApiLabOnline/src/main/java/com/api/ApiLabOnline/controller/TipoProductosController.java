@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.api.ApiLabOnline.services.TipoProductosServices;
-import com.google.gson.JsonArray;
+import com.google.gson.Gson;
 
 @RestController
 @RequestMapping(path="api/v1/tipoproducto")
@@ -21,31 +21,22 @@ public class TipoProductosController {
 	
 	@GetMapping("/all")
 	public String getAll(){
-		JsonArray list = tipoProductosServices.getAll();
-		if(list!=null)
-			System.out.println("Encontro "+list.size()+" tipos de producto");
-		return list.toString();
+		return new Gson().toJson(tipoProductosServices.getAll());
 	}
 	
 	@GetMapping("/list")
 	public String list(@RequestParam("limit") int limit,@RequestParam("offset") int offset){
-//		return estudiosServices.listEstudios(10,0);
-		System.out.println("Si llego all limit["+limit+"] offset["+offset+"]");
-		JsonArray list = tipoProductosServices.list(limit, offset);
-		if(list!=null)
-			System.out.println("Encontro "+list.size()+" tipos de producto");
-		return list.toString();
+		return new Gson().toJson(tipoProductosServices.list(limit, offset));
 	}
 	
 	@GetMapping("/search/{tipoproductoid}")
 	public String getById(@PathVariable("tipoproductoid") Long tipoproductoid){
-		return tipoProductosServices.getById(tipoproductoid).toString();
+		return new Gson().toJson(tipoProductosServices.getById(tipoproductoid));
 	}
 	
 	@PostMapping("/save")
 	public String saveUpdate(@RequestBody String compra){
-		tipoProductosServices.saveOrUpdate(compra);
-		return compra;
+		return new Gson().toJson(tipoProductosServices.saveOrUpdate(compra));
 	}
 	
 	@DeleteMapping("/delete/{tipoproductoid}")

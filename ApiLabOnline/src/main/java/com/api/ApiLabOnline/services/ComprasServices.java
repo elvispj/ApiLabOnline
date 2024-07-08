@@ -25,13 +25,13 @@ public class ComprasServices {
 		return comprasRepository.findById(id);
 	}
 	
-	public void saveOrUpdate(String compra) {
+	public JsonObject saveOrUpdate(String compra) {
 		JsonObject jsonCompra = new Gson().fromJson(compra, JsonObject.class);
 		if(jsonCompra.has("compraid") && jsonCompra.get("compraid")!=null 
 				&& jsonCompra.get("compraid").getAsInt()>0)
-			comprasRepository.update(compra);
+			return comprasRepository.update(compra);
 		else
-			comprasRepository.save(compra);
+			return comprasRepository.save(compra);
 		
 	}
 	

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.api.ApiLabOnline.services.ProveedoresServices;
-import com.google.gson.JsonArray;
+import com.google.gson.Gson;
 
 @RestController
 @RequestMapping(path="api/v1/proveedores")
@@ -21,30 +21,22 @@ public class ProveedoresController {
 	
 	@GetMapping("/all")
 	public String getAll(){
-		JsonArray list = proveedoresServices.getAll();
-		if(list!=null)
-			System.out.println("Encontro "+list.size()+" compras");
-		return list.toString();
+		return new Gson().toJson(proveedoresServices.getAll());
 	}
 	
 	@GetMapping("/list")
 	public String list(@RequestParam("limit") int limit,@RequestParam("offset") int offset){
-		System.out.println("Si llego all limit["+limit+"] offset["+offset+"]");
-		JsonArray list = proveedoresServices.list(limit, offset);
-		if(list!=null)
-			System.out.println("Encontro "+list.size()+" proveedores");
-		return list.toString();
+		return new Gson().toJson(proveedoresServices.list(limit, offset));
 	}
 	
 	@GetMapping("/search/{proveedorid}")
 	public String getById(@PathVariable("proveedorid") Long proveedorid){
-		return proveedoresServices.getById(proveedorid).toString();
+		return new Gson().toJson(proveedoresServices.getById(proveedorid));
 	}
 	
 	@PostMapping("/save")
 	public String saveUpdate(@RequestBody String proveedor){
-		proveedoresServices.saveOrUpdate(proveedor);
-		return proveedor;
+		return new Gson().toJson(proveedoresServices.saveOrUpdate(proveedor));
 	}
 	
 	@DeleteMapping("/delete/{proveedorid}")

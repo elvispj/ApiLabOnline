@@ -26,13 +26,13 @@ public class EstudiosServices {
 		return studentRepository.findById(id);
 	}
 	
-	public void saveOrUpdate(String estudios) {
+	public JsonObject saveOrUpdate(String estudios) {
 		JsonObject estudio = new Gson().fromJson(estudios, JsonObject.class);
 		if(estudio.has("estudioid") && estudio.get("estudioid")!=null 
 				&& estudio.get("estudioid").getAsInt()>0)
-			studentRepository.update(estudios);
+			return studentRepository.update(estudios);
 		else
-			studentRepository.save(estudios);
+			return studentRepository.save(estudios);
 		
 	}
 	

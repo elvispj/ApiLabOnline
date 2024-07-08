@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -52,14 +53,17 @@ public class ProveedoresRepositoryImpl implements ProveedoresRepository {
 
 	@Override
 	public JsonObject findById(Long id) {
-	
 		log.info("Buscar id-"+id);
-		Object[] parametros = {id};
-	    return jdbcTemplate.query("select * FROM proveedores WHERE proveedorid=?", new JsonObjectRowMapper(), parametros).get(0);
+		try {
+			return jdbcTemplate.queryForObject("select * FROM proveedores WHERE proveedorid=?", new JsonObjectRowMapper(), id);
+	    } catch (EmptyResultDataAccessException e) {
+	    	log.info("NO encontro informacion");
+	        return null;
+	    }
 	}
 
 	@Override
-	public void update(String proveedores) {
+	public JsonObject update(String proveedores) {
 		log.info("Actualizando \n"+proveedores.toString());
 		JsonObject jsonproveedores = new Gson().fromJson(proveedores, JsonObject.class);
 		jsonproveedores.addProperty("proveedorfechamodificacion", Utils.getFechaActual());
@@ -67,10 +71,12 @@ public class ProveedoresRepositoryImpl implements ProveedoresRepository {
 				jsonproveedores.get("proveedoractivo").getAsBoolean(), jsonproveedores.get("proveedornombre").getAsString(), 
 				jsonproveedores.get("proveedorfechamodificacion").getAsString(), jsonproveedores.get("proveedorid").getAsInt()};
 		jdbcTemplate.update("update proveedores set proveedoractivo=?, proveedornombre=?, proveedorfechamodificacion=cast(? as timestamp) where proveedorid=?", parametros);
+		
+		return jsonproveedores;
 	}
 
 	@Override
-	public void save(String proveedores) {
+	public JsonObject save(String proveedores) {
 		log.info("Guardado \n"+proveedores.toString());
 		JsonObject jsonProveedores = new Gson().fromJson(proveedores, JsonObject.class);
 		
@@ -85,6 +91,8 @@ public class ProveedoresRepositoryImpl implements ProveedoresRepository {
 				jsonProveedores.get("proveedorfechamodificacion").getAsString(), jsonProveedores.get("bitacoraid").getAsString()};
 		jdbcTemplate.update("INSERT INTO proveedores(proveedorid, proveedoractivo, proveedornombre, proveedorfechacreacion, proveedorfechamodificacion, bitacoraid) "
 				+"VALUES(?, ?, ?, cast(? as timestamp), cast(? as timestamp), ?)", parametros);
+		
+		return jsonProveedores;
 	}
 
 	@Override

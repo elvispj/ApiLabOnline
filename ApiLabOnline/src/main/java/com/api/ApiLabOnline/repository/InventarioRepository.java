@@ -13,9 +13,9 @@ public interface InventarioRepository {
 
 	JsonObject findById(Long id);
 
-	void update(String inventario);
+	JsonObject update(String inventario);
 
-	void save(String inventario);
+	JsonObject save(String inventario);
 
 	int deleteById(Long id);
 

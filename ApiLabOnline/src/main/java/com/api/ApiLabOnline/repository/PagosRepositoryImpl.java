@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -50,17 +51,24 @@ public class PagosRepositoryImpl implements PagosRepository {
 
 	@Override
 	public JsonObject findById(Long id) {
-	
 		log.info("Buscar id-"+id);
-		Object[] parametros = {id};
-	    return jdbcTemplate.query("select * FROM pagos WHERE pagoid=?", new JsonObjectRowMapper(), parametros).get(0);
+		try {
+			return jdbcTemplate.queryForObject("select * FROM pagos WHERE pagoid=?", new JsonObjectRowMapper(), id);
+	    } catch (EmptyResultDataAccessException e) {
+	    	log.info("NO encontro informacion");
+	        return null;
+	    }
 	}
 
 	@Override
 	public JsonObject getPagoByOrdenId(Long ordenid) {
 		log.info("Buscar ordenid-"+ordenid);
-		Object[] parametros = {ordenid};
-	    return jdbcTemplate.query("select * from pagos where ordenid=?", new JsonObjectRowMapper(), parametros).get(0);
+		try {
+		    return jdbcTemplate.queryForObject("select * from pagos where ordenid=?", new JsonObjectRowMapper(), ordenid);
+	    } catch (EmptyResultDataAccessException e) {
+	    	log.info("NO encontro informacion");
+	        return null;
+	    }
 	}
 
 	@Override
@@ -69,7 +77,7 @@ public class PagosRepositoryImpl implements PagosRepository {
 		JsonObject jsonPagos = new Gson().fromJson(pagos, JsonObject.class);
 		jsonPagos.addProperty("pagofechamodificacion", Utils.getFechaActual());
 		Object[] parametros = {
-				jsonPagos.get("pagoestatusid").getAsBoolean(), jsonPagos.get("pagoimporte").getAsDouble(), 
+				jsonPagos.get("pagoestatusid").getAsString(), jsonPagos.get("pagoimporte").getAsDouble(), 
 				jsonPagos.get("pagoiva").getAsDouble(), jsonPagos.get("pagoimportetotal").getAsDouble(), 
 				jsonPagos.get("pagofechamodificacion").getAsString(), jsonPagos.get("pagoid").getAsInt()};
 		jdbcTemplate.update("update pagos set pagoestatusid=?, pagoimporte=?, pagoiva=?, "

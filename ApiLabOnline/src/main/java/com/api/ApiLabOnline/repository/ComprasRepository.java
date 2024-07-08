@@ -11,9 +11,9 @@ public interface ComprasRepository {
 
 	JsonObject findById(Long id);
 
-	void update(String compras);
+	JsonObject update(String compras);
 
-	void save(String compras);
+	JsonObject save(String compras);
 
 	int deleteById(Long id);
 

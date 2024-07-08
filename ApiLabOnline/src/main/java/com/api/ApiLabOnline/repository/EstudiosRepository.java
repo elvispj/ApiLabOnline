@@ -11,9 +11,9 @@ public interface EstudiosRepository {
 
 	JsonObject findById(Long id);
 
-	void save(String student);
+	JsonObject save(String student);
 
-	void update(String estudio);
+	JsonObject update(String estudio);
 
 	int deleteById(Long id);
 

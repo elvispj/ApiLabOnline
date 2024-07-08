@@ -2,7 +2,9 @@ package com.api.ApiLabOnline.repository;
 
 import java.util.List;
 
+import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -13,6 +15,7 @@ import com.google.gson.JsonObject;
 
 @Repository
 public class EstudiosRepositoryImpl implements EstudiosRepository {
+	private Logger log = Logger.getLogger(this.getClass());
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
@@ -23,7 +26,7 @@ public class EstudiosRepositoryImpl implements EstudiosRepository {
 
 	@Override
 	public JsonArray getAll() {
-		System.out.println("Buscar todos");
+		log.debug("Buscar todos");
 		JsonArray lista = new JsonArray();
 		List<JsonObject> listaJsonObject = jdbcTemplate.query("select * from estudios where estudioactivo is true order by 1 desc", 
 				new JsonObjectRowMapper());
@@ -35,7 +38,7 @@ public class EstudiosRepositoryImpl implements EstudiosRepository {
 
 	@Override
 	public JsonArray listEstudios(int limit, int offset) {
-		System.out.println("Buscar todos limit["+limit+"] offset["+offset+"]");
+		log.debug("Buscar todos limit["+limit+"] offset["+offset+"]");
 		JsonArray lista = new JsonArray();
 		Object[] parameters = {limit, offset};
 		List<JsonObject> listaJsonObject = jdbcTemplate.query("select * from estudios where estudioactivo is true order by 1 desc limit ? offset ?", new JsonObjectRowMapper(), parameters);
@@ -47,14 +50,18 @@ public class EstudiosRepositoryImpl implements EstudiosRepository {
 
 	@Override
 	public JsonObject findById(Long id) {
-		System.out.println("Buscar id-"+id);
-		Object[] parametros = {id};
-	    return jdbcTemplate.query("select * FROM estudios WHERE estudioid=?", new JsonObjectRowMapper(), parametros).get(0);
+		log.debug("Buscar id-"+id);
+		try {
+			return jdbcTemplate.queryForObject("select * FROM estudios WHERE estudioid=?", new JsonObjectRowMapper(), id);
+	    } catch (EmptyResultDataAccessException e) {
+	    	log.info("NO encontro informacion");
+	        return null;
+	    }
 	}
 
 	@Override
-	public void save(String estudio) {
-		System.out.println("Guardado \n"+estudio.toString());
+	public JsonObject save(String estudio) {
+		log.debug("Guardado \n"+estudio.toString());
 		JsonObject jsonEstudio = new Gson().fromJson(estudio, JsonObject.class);
 		
 		jsonEstudio.addProperty("estudioid", jdbcTemplate.queryForObject("SELECT nextval('estudios_estudioid_seq') as id;", Long.class));
@@ -71,11 +78,13 @@ public class EstudiosRepositoryImpl implements EstudiosRepository {
 		jdbcTemplate.update("INSERT INTO estudios("
 				+ "estudioid, tipoestudioid, estudioactivo, estudionombre, estudiodescripcion, estudiofechacreacion, estudiofechamodificacion, bitacoraid, estudionombrecorto, estudiocosto) "
 				+"VALUES(?, ?, ?, ?, ?, cast(? as timestamp), cast(? as timestamp), ?, ?, ? )", parametros);
+		
+		return jsonEstudio;
 	}
 
 	@Override
-	public void update(String estudio) {
-		System.out.println("Actualizando \n"+estudio.toString());
+	public JsonObject update(String estudio) {
+		log.debug("Actualizando \n"+estudio.toString());
 		JsonObject jsonEstudio = new Gson().fromJson(estudio, JsonObject.class);
 		jsonEstudio.addProperty("estudiofechamodificacion", Utils.getFechaActual());
 		Object[] parametros = {
@@ -85,11 +94,13 @@ public class EstudiosRepositoryImpl implements EstudiosRepository {
 				jsonEstudio.get("estudioid").getAsInt()};
 		jdbcTemplate.update("update estudios set estudioactivo=?, estudionombre=?, estudiodescripcion=?, "
 				+"estudionombrecorto=?, estudiocosto=?, estudiofechamodificacion=cast(? as timestamp) where estudioid=?", parametros);
+		
+		return jsonEstudio;
 	}
 
 	@Override
 	public int deleteById(Long id) {
-		System.out.println("Eliminado id-"+id);
+		log.debug("Eliminado id-"+id);
 		Object[] parametros = {id};
 	    return jdbcTemplate.update("DELETE FROM estudios WHERE estudioid=? and 1=2", parametros);
 	}

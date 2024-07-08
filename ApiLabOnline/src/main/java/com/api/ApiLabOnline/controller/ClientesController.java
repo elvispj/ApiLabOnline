@@ -25,13 +25,13 @@ public class ClientesController {
 	@GetMapping("/all/")
 	public String getAll(){
 		log.info("get all");
-		return clientesService.all().toString();
+		return new Gson().toJson(clientesService.all());
 	}
 	
 	@GetMapping("/list/")
 	public String getList(@RequestParam("limit") int limit,@RequestParam("offset") int offset){
 		log.info("Si llego all limit["+limit+"] offset["+offset+"]");
-		return clientesService.list(limit, offset).toString();
+		return new Gson().toJson(clientesService.list(limit, offset));
 	}
 	
 	@GetMapping("/search/{clienteid}")
@@ -43,7 +43,7 @@ public class ClientesController {
 	@GetMapping("/searchByLike/{parametro}")
 	public String getByLike(@PathVariable("parametro") String parametro){
 		log.info("Search ByLike "+parametro);
-		return clientesService.findByLike(parametro).toString();
+		return new Gson().toJson(clientesService.findByLike(parametro));
 	}
 	
 	@PostMapping("/save")

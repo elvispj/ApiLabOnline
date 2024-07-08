@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.api.ApiLabOnline.services.PagosServices;
+import com.google.gson.Gson;
 
 @RestController
 @RequestMapping(path="api/v1/pagos")
@@ -25,17 +26,17 @@ public class PagosController {
 	
 	@GetMapping("/list")
 	public String list(@RequestParam("limit") int limit,@RequestParam("offset") int offset){
-		return pagosServices.list(limit, offset).toString();
+		return new Gson().toJson(pagosServices.list(limit, offset));
 	}
 	
 	@GetMapping("/search/orden/{ordenid}")
 	public String getPagoByOrdenId(@PathVariable("ordenid") Long ordenid){
-		return pagosServices.getPagoByOrdenId(ordenid).toString();
+		return new Gson().toJson(pagosServices.getPagoByOrdenId(ordenid));
 	}
 	
 	@GetMapping("/search/{pagoid}")
 	public String getById(@PathVariable("pagoid") Long pagoid){
-		return pagosServices.getById(pagoid).toString();
+		return new Gson().toJson(pagosServices.getById(pagoid));
 	}
 	
 	@PostMapping("/save")

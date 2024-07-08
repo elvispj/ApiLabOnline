@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.api.ApiLabOnline.services.TipoestudiosService;
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 @RestController
@@ -27,19 +26,13 @@ public class TipoestudiosController {
 	@GetMapping("/all/")
 	public String getAll(){
 		log.info("get all");
-		JsonArray list = tipoestudiosService.all();
-		if(list!=null)
-			log.info("Encontro "+list.size()+" elementos");
-		return list.toString();
+		return new Gson().toJson(tipoestudiosService.all());
 	}
 	
 	@GetMapping("/list/")
 	public String getList(@RequestParam("limit") int limit,@RequestParam("offset") int offset){
 		log.info("Si llego all limit["+limit+"] offset["+offset+"]");
-		JsonArray list = tipoestudiosService.list(limit, offset);
-		if(list!=null)
-			log.info("Encontro "+list.size()+" elementos");
-		return list.toString();
+		return new Gson().toJson(tipoestudiosService.list(limit, offset));
 	}
 	
 	@GetMapping("/search/{tipoestudioid}")

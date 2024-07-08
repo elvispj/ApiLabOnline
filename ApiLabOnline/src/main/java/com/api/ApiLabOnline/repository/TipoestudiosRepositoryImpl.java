@@ -2,7 +2,9 @@ package com.api.ApiLabOnline.repository;
 
 import java.util.List;
 
+import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -12,6 +14,7 @@ import com.google.gson.JsonObject;
 
 @Repository
 public class TipoestudiosRepositoryImpl implements TipoestudiosRepository {
+	private Logger log = Logger.getLogger(this.getClass());
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
@@ -43,13 +46,12 @@ public class TipoestudiosRepositoryImpl implements TipoestudiosRepository {
 
 	@Override
 	public JsonObject findById(Long tipoestudioid) {
-		JsonObject jsonObject = new JsonObject();
-		List<JsonObject> e = jdbcTemplate.query("select * FROM tipoestudios WHERE tipoestudioid=?",new JsonObjectRowMapper(), tipoestudioid);
-		if(e!=null && e.size()>0) {
-			jsonObject = e.get(0).getAsJsonObject();
-			System.out.println(jsonObject.toString());
-		}
-		return jsonObject;
+		try {
+			return jdbcTemplate.queryForObject("select * FROM tipoestudios WHERE tipoestudioid=?",new JsonObjectRowMapper(), tipoestudioid);
+	    } catch (EmptyResultDataAccessException e) {
+	    	log.info("NO encontro informacion");
+	        return null;
+	    }
 	}
 
 	@Override
@@ -58,7 +60,7 @@ public class TipoestudiosRepositoryImpl implements TipoestudiosRepository {
 		
 		tipoestudio.addProperty("tipoestudioid", jdbcTemplate.queryForObject("SELECT nextval('tipoestudios_tipoestudioid_seq') as id;", Long.class));
 		
-		System.out.println(tipoestudio.toString());
+		log.debug(tipoestudio.toString());
 
 		Object[] parametros = {tipoestudio.get("tipoestudioid").getAsLong(), tipoestudio.get("tipoestudioactivo").getAsBoolean(), tipoestudio.get("tipoestudionombre").getAsString(), 
 				tipoestudio.get("tipoestudiodescripcion").getAsString(), tipoestudio.get("tipoestudiofechacreacion").getAsString(), 
@@ -66,7 +68,7 @@ public class TipoestudiosRepositoryImpl implements TipoestudiosRepository {
 		jdbcTemplate.update("insert into tipoestudios(tipoestudioid, tipoestudioactivo, tipoestudionombre, "
 				+"tipoestudiodescripcion, tipoestudiofechacreacion, tipoestudiofechamodificacion, bitacoraid) "
 				+ "VALUES(?, ?, ?, ?, cast(? as timestamp), cast(? as timestamp), ?);", parametros);
-		System.out.println("Se registro exitosamente "+tipoestudio.get("tipoestudioid").getAsLong());
+		log.debug("Se registro exitosamente "+tipoestudio.get("tipoestudioid").getAsLong());
 		return tipoestudio;
 	}
 

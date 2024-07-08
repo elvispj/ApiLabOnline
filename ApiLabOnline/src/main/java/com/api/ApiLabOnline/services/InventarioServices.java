@@ -29,13 +29,13 @@ public class InventarioServices {
 		return inventarioRepository.findById(id);
 	}
 	
-	public void saveOrUpdate(String inventario) {
+	public JsonObject saveOrUpdate(String inventario) {
 		JsonObject jsonInventario = new Gson().fromJson(inventario, JsonObject.class);
 		if(jsonInventario.has("inventarioid") && jsonInventario.get("inventarioid")!=null 
 				&& jsonInventario.get("inventarioid").getAsInt()>0)
-			inventarioRepository.update(inventario);
+			return inventarioRepository.update(inventario);
 		else
-			inventarioRepository.save(inventario);
+			return inventarioRepository.save(inventario);
 		
 	}
 	

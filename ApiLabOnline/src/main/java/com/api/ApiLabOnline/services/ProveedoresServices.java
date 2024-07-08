@@ -25,13 +25,13 @@ public class ProveedoresServices {
 		return proveedoresRepository.findById(id);
 	}
 	
-	public void saveOrUpdate(String proveedor) {
+	public JsonObject saveOrUpdate(String proveedor) {
 		JsonObject jsonCompra = new Gson().fromJson(proveedor, JsonObject.class);
 		if(jsonCompra.has("proveedorid") && jsonCompra.get("proveedorid")!=null 
 				&& jsonCompra.get("proveedorid").getAsInt()>0)
-			proveedoresRepository.update(proveedor);
+			return proveedoresRepository.update(proveedor);
 		else
-			proveedoresRepository.save(proveedor);
+			return proveedoresRepository.save(proveedor);
 		
 	}
 	

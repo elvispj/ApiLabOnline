@@ -32,29 +32,33 @@ public class PagosServices {
 
 	public JsonObject getPagoByOrdenId(Long ordenid) {
 		JsonObject pago = pagosRepository.getPagoByOrdenId(ordenid);
-		pago.add("pagodetalle", pagoDetalleServices.findByPagoId(pago.get("pagoid").getAsLong()));
+		if(pago!=null)
+			pago.add("pagodetalle", pagoDetalleServices.findByPagoId(pago.get("pagoid").getAsLong()));
 		return pago;
 	}
 	
-	public void saveOrUpdate(String pago) {
+	public JsonObject saveOrUpdate(String pago) {
 		JsonObject jsonPagos = new Gson().fromJson(pago, JsonObject.class);
-		if(jsonPagos.has("pagoid") && jsonPagos.get("pagoid")!=null 
-				&& jsonPagos.get("pagoid").getAsInt()>0) {
-			jsonPagos=pagosRepository.update(pago);
-		} else {
-			JsonArray listaPagosDetalle = jsonPagos.get("pagodetalle").getAsJsonArray();
-			if(listaPagosDetalle!=null && listaPagosDetalle.size()>0) {
+		JsonArray listaPagosDetalle = jsonPagos.get("pagodetalle").getAsJsonArray();
+		if(listaPagosDetalle!=null && listaPagosDetalle.size()>0) {
+			if(jsonPagos.has("pagoid") && jsonPagos.get("pagoid")!=null 
+					&& jsonPagos.get("pagoid").getAsInt()>0) {
+				jsonPagos=pagosRepository.update(pago);
+				
+			} else {
 				jsonPagos=pagosRepository.save(pago);
-				for(int i=0; i<listaPagosDetalle.size(); i++) {
-					JsonObject detallepago = listaPagosDetalle.get(i).getAsJsonObject();
-					System.out.println(">>> "+detallepago.get("movimientoscaja"));
-					JsonObject movimientoscaja = movimientosCajaService.save(new Gson().toJson(detallepago.get("movimientoscaja")));
-					movimientoscaja.addProperty("movimientocomentarios", "Se agrega pago por orden de estudio ID-"+jsonPagos.get("ordenid").getAsInt());
-					detallepago.addProperty("pagoid", jsonPagos.get("pagoid").getAsInt());
-					detallepago.addProperty("movimientocajaid", movimientoscaja.get("movimientoid").getAsInt());
-					pagoDetalleServices.save(new Gson().toJson(detallepago));
-				}
 			}
+			for(int i=0; i<listaPagosDetalle.size(); i++) {
+				JsonObject detallepago = listaPagosDetalle.get(i).getAsJsonObject();
+//				System.out.println(">>> "+detallepago.get("movimientoscaja"));
+				JsonObject movimientoscaja = movimientosCajaService.save(new Gson().toJson(detallepago.get("movimientoscaja")));
+				detallepago.addProperty("pagoid", jsonPagos.get("pagoid").getAsInt());
+				detallepago.addProperty("movimientocajaid", movimientoscaja.get("movimientoid").getAsInt());
+				detallepago = pagoDetalleServices.save(new Gson().toJson(detallepago));
+			}
+			return jsonPagos;
+		} else {
+			return null;
 		}
 	}
 	

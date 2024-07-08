@@ -11,9 +11,9 @@ public interface TipoProductosRepository {
 
 	JsonObject findById(Long id);
 
-	void update(String tipoProductos);
+	JsonObject update(String tipoProductos);
 
-	void save(String tipoProductos);
+	JsonObject save(String tipoProductos);
 
 	int deleteById(Long id);
 

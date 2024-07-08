@@ -2,7 +2,9 @@ package com.api.ApiLabOnline.repository;
 
 import java.util.List;
 
+import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -13,6 +15,7 @@ import com.google.gson.JsonObject;
 
 @Repository
 public class ComprasRepositoryImpl implements ComprasRepository {
+	private Logger log = Logger.getLogger(this.getClass());
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
@@ -24,7 +27,7 @@ public class ComprasRepositoryImpl implements ComprasRepository {
 	@Override
 	public JsonArray getAll() {
 	
-		System.out.println("Buscar todos");
+		log.debug("Buscar todos");
 		JsonArray lista = new JsonArray();
 		List<JsonObject> listaJsonObject = jdbcTemplate.query("select * from compras where compraactivo is true order by 1 desc", 
 				new JsonObjectRowMapper());
@@ -36,7 +39,7 @@ public class ComprasRepositoryImpl implements ComprasRepository {
 
 	@Override
 	public JsonArray list(int limit, int offset) {
-		System.out.println("Buscar todos limit["+limit+"] offset["+offset+"]");
+		log.debug("Buscar todos limit["+limit+"] offset["+offset+"]");
 		JsonArray lista = new JsonArray();
 		Object[] parameters = {limit, offset};
 		List<JsonObject> listaJsonObject = jdbcTemplate.query("select * from compras where compraactivo is true order by 1 desc limit ? offset ?", new JsonObjectRowMapper(), parameters);
@@ -48,15 +51,19 @@ public class ComprasRepositoryImpl implements ComprasRepository {
 
 	@Override
 	public JsonObject findById(Long id) {
-	
-		System.out.println("Buscar id-"+id);
+		log.debug("Buscar id-"+id);
 		Object[] parametros = {id};
-	    return jdbcTemplate.query("select * FROM compras WHERE compraid=?", new JsonObjectRowMapper(), parametros).get(0);
+		try {
+			return jdbcTemplate.queryForObject("select * FROM compras WHERE compraid=?", new JsonObjectRowMapper(), parametros);
+	    } catch (EmptyResultDataAccessException e) {
+	    	log.info("NO encontro informacion");
+	        return null;
+	    }
 	}
 
 	@Override
-	public void update(String compras) {
-		System.out.println("Actualizando \n"+compras.toString());
+	public JsonObject update(String compras) {
+		log.debug("Actualizando \n"+compras.toString());
 		JsonObject jsonCompras = new Gson().fromJson(compras, JsonObject.class);
 		jsonCompras.addProperty("comprafechamodificacion", Utils.getFechaActual());
 		Object[] parametros = {
@@ -66,11 +73,13 @@ public class ComprasRepositoryImpl implements ComprasRepository {
 				jsonCompras.get("compraid").getAsInt()};
 		jdbcTemplate.update("update compras set compraactivo=?, compranumeroarticulos=?, compraimporteneto=?, "
 				+"compraimporteiva=?, compraimportetotal=?, comprafechamodificacion=cast(? as timestamp) where compraid=?", parametros);
+		
+		return jsonCompras;
 	}
 
 	@Override
-	public void save(String compras) {
-		System.out.println("Guardado \n"+compras.toString());
+	public JsonObject save(String compras) {
+		log.debug("Guardado \n"+compras.toString());
 		JsonObject jsonCompras = new Gson().fromJson(compras, JsonObject.class);
 		
 		jsonCompras.addProperty("compraid", jdbcTemplate.queryForObject("SELECT nextval('compras_compraid_seq') as id;", Long.class));
@@ -87,6 +96,8 @@ public class ComprasRepositoryImpl implements ComprasRepository {
 		jdbcTemplate.update("INSERT INTO compras(compraid,proveedorid,compraactivo,compranumeroarticulos,compraimporteneto,"
 				+"compraimporteiva,compraimportetotal,comprafechacreacion,comprafechamodificacion,bitacoraid) "
 				+"VALUES(?, ?, ?, ?, ?, ?, ?, cast(? as timestamp), cast(? as timestamp), ?)", parametros);
+
+		return jsonCompras;
 	}
 
 	@Override

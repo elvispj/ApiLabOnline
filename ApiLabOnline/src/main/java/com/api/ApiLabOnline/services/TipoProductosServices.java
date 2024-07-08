@@ -25,13 +25,13 @@ public class TipoProductosServices {
 		return tipoProductosRepository.findById(id);
 	}
 	
-	public void saveOrUpdate(String tipoproducto) {
+	public JsonObject saveOrUpdate(String tipoproducto) {
 		JsonObject jsonTipoProducto = new Gson().fromJson(tipoproducto, JsonObject.class);
 		if(jsonTipoProducto.has("tipoproductoid") && jsonTipoProducto.get("tipoproductoid")!=null 
 				&& jsonTipoProducto.get("tipoproductoid").getAsInt()>0)
-			tipoProductosRepository.update(tipoproducto);
+			return tipoProductosRepository.update(tipoproducto);
 		else
-			tipoProductosRepository.save(tipoproducto);
+			return tipoProductosRepository.save(tipoproducto);
 		
 	}
 	
