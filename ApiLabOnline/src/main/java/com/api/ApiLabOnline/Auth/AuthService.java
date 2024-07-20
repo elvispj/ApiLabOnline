@@ -10,10 +10,13 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.api.ApiLabOnline.entity.Usuario;
 import com.api.ApiLabOnline.jwt.JwtService;
 import com.api.ApiLabOnline.jwt.Role;
 import com.api.ApiLabOnline.jwt.User;
 import com.api.ApiLabOnline.repository.UserRepository;
+import com.api.ApiLabOnline.services.UsuarioServices;
+import com.api.ApiLabOnline.utils.Utils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,43 +25,48 @@ import lombok.RequiredArgsConstructor;
 public class AuthService {
 	@Autowired
 	private JwtService jwtService;
-	@Autowired
-	private UserRepository userRepository;
+//	@Autowired
+//	private UserRepository userRepository;
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+//	@Autowired
+//	private AuthenticationManager authenticationManager; 
 	@Autowired
-	private AuthenticationManager authenticationManager; 
+	private UsuarioServices usuarioService;
 	
 	private Logger log = LogManager.getLogger(this.getClass());
 
 	public AuthResponse login(LoginRequest request) {
 		log.info("Login "+request.toString());
-		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
-		User user =userRepository.findByUsername(request.getUsername()).orElseThrow(() -> new UsernameNotFoundException("No se encontro el usuario."));
+//		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
+		Usuario usuario =usuarioService.findByUsuariocorreo(request.getUsername());
+		if(usuario==null)
+			new UsernameNotFoundException("No se encontro el usuario.");
 		
-		System.out.println("Recupero "+user.toString());
+		System.out.println("Recupero "+usuario.toString());
 		
-		String token = jwtService.getToken(user);
+		String token = jwtService.getToken(usuario);
 		AuthResponse res = AuthResponse.builder()
-				.id(user.getId())
-				.username(user.getUsername())
-				.firstname(user.getFirstname())
-				.lastname(user.getLastname())
-				.country(user.getCountry())
-				.role(user.getRole())
+				.id(usuario.getUsuarioid())
+				.username(usuario.getUsuariocorreo())
+				.firstname(usuario.getUsuarionombre())
+				.lastname(usuario.getUsuarioapellidopaterno()+" "+usuario.getUsuarioapellidomaterno())
+				.country("country")
+				.perfilid(usuario.getPerfilid())
 				.token(token)
 				.build();
-		log.info("Get User >> "+user.toString());
+		log.info("Get User >> "+usuario.toString());
+		log.info("Return>>",res);
 		return res;
 	}
 
 	public AuthResponse update(ChangeRequest request) {
 		log.info("Update "+request.toString());
-		User user =userRepository.findByUsername(request.getUsername()).orElseThrow(() -> new UsernameNotFoundException("No se encontro el usuario."));
-		user.setPassword(passwordEncoder.encode(request.getPasswordnew()));
+		Usuario user =usuarioService.findByUsuariocorreo(request.getUsername());
+		user.setUsuariopwd(passwordEncoder.encode(request.getPasswordnew()));
 		log.info("Update >> "+user.toString());
 		
-		userRepository.save(user);
+		usuarioService.save(user);
 		
 		return AuthResponse.builder()
 				.token(jwtService.getToken(user))
@@ -67,17 +75,25 @@ public class AuthService {
 
 	public AuthResponse register(RegisterRequest request) {
 		log.info("Register "+request.toString());
-		User user = User.builder()
-				.username(request.getUsername())
-				.password(passwordEncoder.encode(request.getPassword()))
-				.firstname(request.getFirstname())
-				.lastname(request.getLastname())
-				.country(request.getCountry())
-				.role(request.getRole())
+		Usuario user = Usuario.builder()
+				.usuarioactivo(true)
+				.usuariocorreo(request.getUsername())
+				.usuariopwd(passwordEncoder.encode(request.getPassword()))
+				.perfilid(request.getPerfilid())
+				.usuarionombre(request.getFirstname())
+				.usuarioapellidopaterno(request.getLastname())
+				.usuarioapellidomaterno("")
+				.colaboradorid(-1)
+				.usuariofechacreacion(Utils.getFecha())
+				.usuariofechamodificacion(Utils.getFecha())
+				.usuarioultimoacceso(Utils.getFecha())
+				.usuariokey("")
+				.usuarioimage(null)
 				.build();
+//		.country(request.getCountry())
 		log.info("Save >> "+user.toString());
 		
-		userRepository.save(user);
+		usuarioService.save(user);
 		
 		return AuthResponse.builder()
 				.token(jwtService.getToken(user))

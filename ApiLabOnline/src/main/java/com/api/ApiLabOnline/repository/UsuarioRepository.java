@@ -7,4 +7,6 @@ public interface UsuarioRepository {
 	Usuario findByUsuariocorreo(String usuariocorreo);
 	
 	Usuario findByUsuarioid(int usuarioid);
+
+	Usuario save(Usuario user);
 }

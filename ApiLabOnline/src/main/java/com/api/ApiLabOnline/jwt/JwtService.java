@@ -6,8 +6,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-import org.springframework.security.core.userdetails.UserDetails;
+//import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+
+import com.api.ApiLabOnline.entity.Usuario;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -20,15 +22,15 @@ public class JwtService {
 	
 	private static final String SECRET_KEY = "5DFG5DF5DFG5DFG5DFG5DFG5DFG5DFG5DFG5DFG5DFG5DFG5DFGG54DF35G43FD54G35FD4G35DF4DG35DF4";
 
-	public String getToken(UserDetails user) {
+	public String getToken(Usuario user) {
 		return getToken(new HashMap<>(), user);
 	}
 
-	private String getToken(Map<String, Object> extraClaims, UserDetails user) {
+	private String getToken(Map<String, Object> extraClaims, Usuario user) {
 		return Jwts
 				.builder()
 				.setClaims(extraClaims)
-				.setSubject(user.getUsername())
+				.setSubject(user.getUsuariocorreo())
 				.setIssuedAt(new Date(System.currentTimeMillis()))
 				.setExpiration(new Date(System.currentTimeMillis()+(1000*60*60*24)))
 				.signWith(getKey(), SignatureAlgorithm.HS256)
@@ -45,11 +47,11 @@ public class JwtService {
         return getClaims(token, Claims::getSubject);
     }
 
-    public boolean isTokenValid(String token, UserDetails userDetails) {
+    public boolean isTokenValid(String token, String usuariocorreo) {
         
         String username=getUserNameFromToken(token);
         
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        return (username.equals(usuariocorreo) && !isTokenExpired(token));
     }
     
     private Claims getAllClaims(String token) {

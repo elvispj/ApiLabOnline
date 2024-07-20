@@ -17,5 +17,5 @@ public class RegisterRequest {
 	String firstname;
 	String lastname;
 	String country;
-	Role role;
+	int perfilid;
 }

@@ -18,5 +18,5 @@ public class AuthResponse {
 	String firstname;
 	String lastname;
 	String country;
-	Role role;
+	int perfilid;
 }

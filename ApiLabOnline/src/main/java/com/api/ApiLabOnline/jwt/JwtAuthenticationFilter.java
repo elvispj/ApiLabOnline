@@ -19,6 +19,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.api.ApiLabOnline.entity.Usuario;
+import com.api.ApiLabOnline.services.UsuarioServices;
+
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	
@@ -29,6 +32,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	@Autowired
     private UserDetailsService userDetailsService;
+	@Autowired
+	private UsuarioServices usuarioService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -45,9 +50,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         username = jwtService.getUserNameFromToken(token);
         
         if(username!=null && SecurityContextHolder.getContext().getAuthentication()==null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+//            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        	UserDetails userDetails = usuarioService.getUser(username);
+        	
             
-            if(jwtService.isTokenValid(token, userDetails)) {
+            if(jwtService.isTokenValid(token, userDetails.getUsername())) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

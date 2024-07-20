@@ -26,5 +26,4 @@ public class Usuario {
 	 Timestamp usuarioultimoacceso;
 	 String usuariokey;
 	 String usuarioimage;
-	 String token;
 }
