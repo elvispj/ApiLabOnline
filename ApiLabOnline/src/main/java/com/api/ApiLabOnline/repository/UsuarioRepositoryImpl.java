@@ -2,9 +2,9 @@ package com.api.ApiLabOnline.repository;
 
 import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapperResultSetExtractor;
 import org.springframework.stereotype.Repository;
 
 import com.api.ApiLabOnline.entity.Usuario;
@@ -23,10 +23,14 @@ public class UsuarioRepositoryImpl implements UsuarioRepository {
 	@Override
 	public Usuario findByUsuariocorreo(String usuariocorreo) {
 		log.info("find by usuariocorreo-"+usuariocorreo);
-		return jdbcTemplate.query("select * from usuarios where usuarioactivo is true and usuariocorreo=?", 
-				new BeanPropertyRowMapper<Usuario>(Usuario.class), usuariocorreo).get(0);
-//		jdbcTemplate.query("select * from usuario where usuarioactivo is true and usuariocorreo=?", 
-//				new BeanPropertyRowMapper<Usuario>(Usuario.class), parameters);
+		try {
+			return jdbcTemplate.query("select * from usuarios where usuarioactivo is true and usuariocorreo=?", 
+					new BeanPropertyRowMapper<Usuario>(Usuario.class), usuariocorreo).get(0);
+	    } catch (EmptyResultDataAccessException e) {
+	    	e.printStackTrace();
+	    	log.info("No encontro informacion del usuario");
+	        return null;
+	    }
 	}
 
 	@Override
@@ -34,19 +38,33 @@ public class UsuarioRepositoryImpl implements UsuarioRepository {
 		log.info("find by usuarioid-"+usuarioid);
 		return jdbcTemplate.query("select * from usuarios where usuarioid=?", 
 				new BeanPropertyRowMapper<Usuario>(Usuario.class), usuarioid).get(0);
-//		return jdbcTemplate.queryForObject("select * from usuarios where usuarioid=?", Usuario.class,usuarioid);
 	}
 
 	@Override
 	public Usuario save(Usuario usuario) {
-		Object[] parameters = {usuario.getPerfilid(), usuario.getColaboradorid(), usuario.isUsuarioactivo(), 
-				usuario.getUsuariocorreo(), usuario.getUsuariopwd(), usuario.getUsuarionombre(), 
-				usuario.getUsuarioapellidopaterno(), usuario.getUsuarioapellidomaterno(), 
-				usuario.getUsuariofechamodificacion(), usuario.getUsuarioultimoacceso(), 
-				usuario.getUsuariokey(), usuario.getUsuarioimage(), usuario.getUsuarioid()};
-		jdbcTemplate.update("UPDATE usuarios SET perfilid=?, colaboradorid=?, usuarioactivo=?, usuariocorreo=?, "
-				+"usuariopwd=?, usuarionombre=?', usuarioapellidopaterno=?', usuarioapellidomaterno=?, usuariofechamodificacion=?::timestamp, "
-				+"usuarioultimoacceso=?::timestamp, usuariokey=?, usuarioimage=? WHERE usuarioid=?;", parameters);
+		Object[] parameters;
+		if(usuario.getUsuarioid()>0){
+			log.info("update >> "+usuario.toString());
+			parameters= new Object[]{usuario.getPerfilid(), usuario.getColaboradorid(), usuario.isUsuarioactivo(), 
+					usuario.getUsuariocorreo(), usuario.getUsuariopwd(), usuario.getUsuarionombre(), 
+					usuario.getUsuarioapellidopaterno(), usuario.getUsuarioapellidomaterno(), 
+					usuario.getUsuariofechamodificacion(), usuario.getUsuarioultimoacceso(), 
+					usuario.getUsuariokey(), usuario.getUsuarioimage(), usuario.getUsuarioid()};
+			jdbcTemplate.update("UPDATE usuarios SET perfilid=?, colaboradorid=?, usuarioactivo=?, usuariocorreo=?, "
+					+"usuariopwd=?, usuarionombre=?', usuarioapellidopaterno=?', usuarioapellidomaterno=?, usuariofechamodificacion=?::timestamp, "
+					+"usuarioultimoacceso=?::timestamp, usuariokey=?, usuarioimage=? WHERE usuarioid=?;", parameters);
+		} else {
+			usuario.setUsuarioid(jdbcTemplate.queryForObject("SELECT nextval('usuariosid_seq') as id;", Integer.class));
+			log.info("insert >> "+usuario.toString());
+			parameters= new Object[]{usuario.getUsuarioid(),usuario.getPerfilid(), usuario.getColaboradorid()<1?null:usuario.getColaboradorid(), usuario.isUsuarioactivo(), 
+					usuario.getUsuariocorreo(), usuario.getUsuariopwd(), usuario.getUsuarionombre(), usuario.getUsuarioapellidopaterno(), 
+					usuario.getUsuarioapellidomaterno(), usuario.getUsuariofechacreacion(), usuario.getUsuariofechamodificacion(), 
+					usuario.getUsuarioultimoacceso(), usuario.getUsuariokey(), usuario.getUsuarioimage()};
+			jdbcTemplate.update("INSERT INTO public.usuarios(usuarioid, perfilid, colaboradorid, usuarioactivo, usuariocorreo, "
+					+"usuariopwd, usuarionombre, usuarioapellidopaterno, usuarioapellidomaterno, usuariofechacreacion, "
+					+"usuariofechamodificacion, usuarioultimoacceso, usuariokey, usuarioimage) "
+					+"VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?::timestamp, ?::timestamp, ?::timestamp, ?, ?);",parameters);
+		}
 		return usuario;
 	}
 }

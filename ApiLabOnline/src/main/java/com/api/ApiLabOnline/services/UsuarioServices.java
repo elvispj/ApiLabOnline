@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -20,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class UsuarioServices {
+	private Logger log = Logger.getLogger(this.getClass());
 	@Autowired
 	private UsuarioRepository usuarioRepository;
 	@Autowired
@@ -27,7 +29,6 @@ public class UsuarioServices {
 	
 	public User getUser(String usuariocorreo) {
 		Usuario usuario = usuarioRepository.findByUsuariocorreo(usuariocorreo);
-//		usuario.setPerfil(perfilRepository.findByPerfilid(usuario.getPerfilid()));
 	    List<GrantedAuthority> authorities = buildUserAuthority(perfilRepository.findByPerfilid(usuario.getPerfilid()));
 		return buildUserForAuthentication(usuario,authorities);
 	}
@@ -47,7 +48,7 @@ public class UsuarioServices {
 	private List<GrantedAuthority> buildUserAuthority(Perfil perfil){//Set<Perfil> perfil) {
 	    Set<GrantedAuthority> setAuths = new HashSet<GrantedAuthority>(); 
 //	    for(UserRole userRole  : userRoles){
-	        System.out.println("called buildUserAuthority(Set<UserRole> userRoles) method.....");
+	        log.info("called buildUserAuthority(role) method....."+perfil.getPerfilnombre());
 //	        setAuths.add(new SimpleGrantedAuthority(userRole.getRole()));
 //	    }
 	    setAuths.add(new SimpleGrantedAuthority(perfil.getPerfilnombre()));
@@ -57,7 +58,8 @@ public class UsuarioServices {
 	
 	private User buildUserForAuthentication(Usuario user, List<GrantedAuthority> authorities) {
 	    //accountNonExpired, credentialsNonExpired, accountNonLocked, authorities properties
-	    System.out.println("called buildUserForAuthentication(Users user, List<GrantedAuthority> authorities) method....");
+		log.info("called buildUserForAuthentication(Users user, List<GrantedAuthority> authorities) method....");
+		log.info(user.getUsuariocorreo()+" - "+ user.getUsuariopwd()+ " - " + user.isUsuarioactivo());
 	    return new User(user.getUsuariocorreo(), user.getUsuariopwd(), user.isUsuarioactivo(), true, true, true, authorities);
 	}
 	

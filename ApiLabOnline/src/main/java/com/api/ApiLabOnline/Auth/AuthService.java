@@ -3,18 +3,12 @@ package com.api.ApiLabOnline.Auth;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.api.ApiLabOnline.entity.Usuario;
 import com.api.ApiLabOnline.jwt.JwtService;
-import com.api.ApiLabOnline.jwt.Role;
-import com.api.ApiLabOnline.jwt.User;
-import com.api.ApiLabOnline.repository.UserRepository;
 import com.api.ApiLabOnline.services.UsuarioServices;
 import com.api.ApiLabOnline.utils.Utils;
 
@@ -43,20 +37,13 @@ public class AuthService {
 		if(usuario==null)
 			new UsernameNotFoundException("No se encontro el usuario.");
 		
-		System.out.println("Recupero "+usuario.toString());
-		
 		String token = jwtService.getToken(usuario);
 		AuthResponse res = AuthResponse.builder()
-				.id(usuario.getUsuarioid())
-				.username(usuario.getUsuariocorreo())
-				.firstname(usuario.getUsuarionombre())
-				.lastname(usuario.getUsuarioapellidopaterno()+" "+usuario.getUsuarioapellidomaterno())
-				.country("country")
-				.perfilid(usuario.getPerfilid())
+				.usuario(usuario)
 				.token(token)
 				.build();
 		log.info("Get User >> "+usuario.toString());
-		log.info("Return>>",res);
+		log.info("Return>>",res.toString());
 		return res;
 	}
 
@@ -69,34 +56,24 @@ public class AuthService {
 		usuarioService.save(user);
 		
 		return AuthResponse.builder()
+				.usuario(user)
 				.token(jwtService.getToken(user))
 				.build();
 	}
 
-	public AuthResponse register(RegisterRequest request) {
-		log.info("Register "+request.toString());
-		Usuario user = Usuario.builder()
-				.usuarioactivo(true)
-				.usuariocorreo(request.getUsername())
-				.usuariopwd(passwordEncoder.encode(request.getPassword()))
-				.perfilid(request.getPerfilid())
-				.usuarionombre(request.getFirstname())
-				.usuarioapellidopaterno(request.getLastname())
-				.usuarioapellidomaterno("")
-				.colaboradorid(-1)
-				.usuariofechacreacion(Utils.getFecha())
-				.usuariofechamodificacion(Utils.getFecha())
-				.usuarioultimoacceso(Utils.getFecha())
-				.usuariokey("")
-				.usuarioimage(null)
-				.build();
-//		.country(request.getCountry())
-		log.info("Save >> "+user.toString());
+	public AuthResponse register(Usuario usuario) {
+		log.info("Register "+usuario.toString());
+		usuario.setUsuarioactivo(true);
+		usuario.setUsuariopwd(passwordEncoder.encode(usuario.getUsuariopwd()));
+		usuario.setUsuariofechacreacion(Utils.getFecha());
+		usuario.setUsuariofechamodificacion(Utils.getFecha());
+		usuario.setUsuarioultimoacceso(Utils.getFecha());
+		usuario.setUsuariokey("");
 		
-		usuarioService.save(user);
+		usuarioService.save(usuario);
 		
 		return AuthResponse.builder()
-				.token(jwtService.getToken(user))
+				.token(jwtService.getToken(usuario))
 				.build();
 	}
 

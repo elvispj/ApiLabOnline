@@ -1,6 +1,6 @@
 package com.api.ApiLabOnline.Auth;
 
-import com.api.ApiLabOnline.jwt.Role;
+import com.api.ApiLabOnline.entity.Usuario;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,11 +12,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AuthResponse {
-	int id;
+	Usuario usuario;
 	String token;
-	String username;
-	String firstname;
-	String lastname;
-	String country;
-	int perfilid;
 }

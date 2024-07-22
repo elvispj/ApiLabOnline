@@ -11,47 +11,47 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.api.ApiLabOnline.services.DoctoresService;
+import com.api.ApiLabOnline.services.PacientesService;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 @RestController
-@RequestMapping(path="api/v1/doctores")
-public class DoctoresController {
+@RequestMapping(path="api/v1/pacientes")
+public class PacientesController {
 	@Autowired
-	private DoctoresService doctoresService;
+	private PacientesService pacientesService;
 	
-	private Logger log = LogManager.getLogger(DoctoresController.class);
+	private Logger log = LogManager.getLogger(this.getClass());
 	
 	@GetMapping("/all/")
 	public String getAll(){
 		log.info("get all");
-		return new Gson().toJson(doctoresService.all());
+		return new Gson().toJson(pacientesService.all());
 	}
 	
 	@GetMapping("/list/")
 	public String getList(@RequestParam("limit") int limit,@RequestParam("offset") int offset){
 		log.info("get list");
-		return new Gson().toJson(doctoresService.list(limit, offset));
+		return new Gson().toJson(pacientesService.list(limit, offset));
 	}
 	
-	@GetMapping("/searchByUsuarioid/{usuarioid}")
-	public String getByUsuarioid(@PathVariable("usuarioid") Long usuarioid){
-		log.info("Search ByUsuarioId "+usuarioid);
-		return new Gson().toJson(doctoresService.findByUsuarioId(usuarioid));
+	@GetMapping("/listByDoctorid/{doctorid}")
+	public String getByDoctorid(@PathVariable("doctorid") Long doctorid){
+		log.info("Search getByDoctorid "+doctorid);
+		return new Gson().toJson(pacientesService.listByDoctorid(doctorid));
 	}
 	
-	@GetMapping("/search/{doctorid}")
-	public String getById(@PathVariable("doctorid") Long doctorid){
-		log.info("Search ById "+doctorid);
-		JsonObject orden =doctoresService.findById(doctorid); 
+	@GetMapping("/search/{pacienteid}")
+	public String getById(@PathVariable("pacienteid") Long pacienteid){
+		log.info("Search ById "+pacienteid);
+		JsonObject orden =pacientesService.findById(pacienteid); 
 		return new Gson().toJson(orden);
 	}
 	
 	@PostMapping("/save")
-	public String saveUpdate(@RequestBody String jsonDoctor){
-		log.info("Save "+jsonDoctor);
-		return new Gson().toJson(doctoresService.save(jsonDoctor));
+	public String saveUpdate(@RequestBody String jsonPaciente){
+		log.info("Save "+jsonPaciente);
+		return new Gson().toJson(pacientesService.save(jsonPaciente));
 	}
 
 }

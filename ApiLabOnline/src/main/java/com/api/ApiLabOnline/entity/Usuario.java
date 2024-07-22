@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class Usuario {
 	 int usuarioid;
 	 int perfilid;
-	 int colaboradorid;
+	 Integer colaboradorid;
 	 boolean usuarioactivo;
 	 String usuariocorreo;
 	 String usuariopwd;

@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.api.ApiLabOnline.entity.Usuario;
+
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -24,7 +26,7 @@ public class AuthController {
 	}
 	
 	@PostMapping("register")
-	public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
+	public ResponseEntity<AuthResponse> register(@RequestBody Usuario request) {
 		return ResponseEntity.ok(authService.register(request));
 	}
 	

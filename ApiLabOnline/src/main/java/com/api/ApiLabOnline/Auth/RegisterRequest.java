@@ -1,7 +1,5 @@
 package com.api.ApiLabOnline.Auth;
 
-import com.api.ApiLabOnline.jwt.Role;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

@@ -57,6 +57,16 @@ public class DoctoresRepositoryImpl implements DoctoresRepository {
 	}
 
 	@Override
+	public JsonObject findByUsuarioId(Long usuarioid) {
+		try {
+			return jdbcTemplate.queryForObject("select * FROM doctores WHERE doctoractivo is true and usuarioid=?",new JsonObjectRowMapper(), usuarioid);
+	    } catch (EmptyResultDataAccessException e) {
+	    	log.info("NO encontro informacion del doctor");
+	        return null;
+	    }
+	}
+
+	@Override
 	public JsonObject update(String jsonDoctor) {
 		JsonObject doctor = new Gson().fromJson(jsonDoctor, JsonObject.class);
 
@@ -64,9 +74,9 @@ public class DoctoresRepositoryImpl implements DoctoresRepository {
 
 		Object[] parametros = {doctor.get("doctoractivo").getAsBoolean(), doctor.get("doctornombre").getAsString(), doctor.get("doctorapellidopaterno").getAsString(), 
 				doctor.get("doctorapellidomaterno").getAsString(), doctor.get("doctorcedula").getAsString(), doctor.get("doctortitulo").getAsString(), 
-				doctor.get("doctorfechamodificacion").getAsString(), doctor.get("doctorid").getAsInt()};
+				doctor.get("usuariopref").getAsString(), doctor.get("doctorfechamodificacion").getAsString(), doctor.get("doctorid").getAsInt()};
 		jdbcTemplate.update("update doctores set doctoractivo=?, doctornombre=?, doctorapellidopaterno=?, doctorapellidomaterno=?, "
-				+ "doctorcedula=?, doctortitulo=?, doctorfechamodificacion=cast(? as timestamp) where doctorid=? ", parametros);
+				+ "doctorcedula=?, doctortitulo=?, usuariopref=?, doctorfechamodificacion=cast(? as timestamp) where doctorid=? ", parametros);
 		
 		log.info("Se actualizo "+doctor.toString());
 		return doctor;
@@ -85,10 +95,10 @@ public class DoctoresRepositoryImpl implements DoctoresRepository {
 		Object[] parametros = {doctor.get("doctorid").getAsLong(), doctor.get("doctoractivo").getAsBoolean(), doctor.get("doctornombre").getAsString(), 
 				doctor.get("doctorapellidopaterno").getAsString(), doctor.get("doctorapellidomaterno").getAsString(), 
 				doctor.get("doctorcedula").getAsString(), doctor.get("doctortitulo").getAsString(), doctor.get("doctorfechacreacion").getAsString(), 
-				doctor.get("doctorfechamodificacion").getAsString(), doctor.get("bitacoraid").getAsInt()};
+				doctor.get("doctorfechamodificacion").getAsString(), doctor.get("bitacoraid").getAsInt(), doctor.get("usuariopref").getAsString()};
 		jdbcTemplate.update("INSERT INTO doctores(doctorid, doctoractivo, doctornombre, doctorapellidopaterno, doctorapellidomaterno, "
-				+ "doctorcedula, doctortitulo, doctorfechacreacion, doctorfechamodificacion, bitacoraid) "
-				+ "VALUES(?, ?, ?, ?, ?, ?, ?, cast(? as timestamp), cast(? as timestamp), ?);", parametros);
+				+ "doctorcedula, doctortitulo, doctorfechacreacion, doctorfechamodificacion, bitacoraid, usuariopref) "
+				+ "VALUES(?, ?, ?, ?, ?, ?, ?, cast(? as timestamp), cast(? as timestamp), ?, ?);", parametros);
 		log.info("Se registro exitosamente "+doctor.toString());
 		return doctor;
 	}

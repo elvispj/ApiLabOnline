@@ -14,6 +14,9 @@ public class DoctoresService {
 	@Autowired
 	private DoctoresRepository doctoresRepository;
 
+	@Autowired
+	private EspecialidadesService especialidadesService;
+
 	public JsonArray all() {
 		return doctoresRepository.all();
 	}
@@ -22,8 +25,14 @@ public class DoctoresService {
 		return doctoresRepository.list(limit, offset);
 	}
 
-	public JsonObject findById(Long tipoestudioid) {
-		return doctoresRepository.findById(tipoestudioid);
+	public JsonObject findById(Long doctorid) {
+		return doctoresRepository.findById(doctorid);
+	}
+
+	public JsonObject findByUsuarioId(Long usuarioid) {
+		JsonObject doctor = doctoresRepository.findByUsuarioId(usuarioid);
+		doctor.add("especialidades", especialidadesService.listByDoctorid(doctor.get("doctorid").getAsLong()));
+		return doctor;
 	}
 
 	public JsonObject save(String jsonDoctor) {
