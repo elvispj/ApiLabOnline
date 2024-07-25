@@ -9,6 +9,8 @@ public interface OrdenesRepository {
 
 	JsonObject findById(Long id);
 
+	JsonObject update(String jsonOrden);
+
 	JsonObject save(String jsonOrden);
 
 	int deleteById(Long id);

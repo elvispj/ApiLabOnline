@@ -64,6 +64,30 @@ public class OrdenesRepositoryImpl implements OrdenesRepository {
 	}
 
 	@Override
+	public JsonObject update(String jsonOrden) {
+		JsonObject orden = new Gson().fromJson(jsonOrden, JsonObject.class);
+		
+		orden.addProperty("ordenfechamodificacion", Utils.getFechaActual());
+
+		Object[] parametros = {orden.get("ordenactiva").getAsBoolean(), orden.get("colaboradorid").getAsInt(), 
+				orden.get("clienteid").getAsInt(), orden.get("ordennombre").getAsString(), orden.get("ordenedad").getAsInt(), 
+				orden.get("ordentelefono").getAsString(), orden.get("ordendireccion").getAsString(), orden.get("ordenformaentrega").getAsString(), 
+				orden.get("ordenfechamodificacion").getAsString(), orden.get("doctorid").getAsInt(), 
+				orden.get("ordenorigen").getAsString(), orden.get("ordencomentarios").getAsString(), 
+				orden.get("ordenimporte").getAsDouble(), orden.get("ordenimporteiva").getAsDouble(), orden.get("ordendescuento").getAsDouble(), 
+				orden.get("ordenimportedescuento").getAsDouble(), orden.get("ordenimportetotal").getAsDouble(), orden.get("ordencomoubico").getAsString(), 
+				orden.get("ordendatosclinicos").getAsString(), orden.get("ordenimportemaquila").getAsDouble(), orden.get("ordensexo").getAsString(), 
+				orden.get("formapagoid").getAsString(), orden.get("ordenimporteotrocobro").getAsDouble(), orden.get("ordenid").getAsLong()};
+		jdbcTemplate.update("UPDATE ordenes "
+				+ "SET ordenactiva=?,colaboradorid=?, clienteid=?, ordennombre=?, ordenedad=?, ordentelefono=?, ordendireccion=?, ordenformaentrega=?, "
+				+ "ordenfechamodificacion=?::timestamp, doctorid=?, ordenorigen=?, ordencomentarios=?, ordenimporte=?, ordenimporteiva=?, "
+				+ "ordendescuento=?, ordenimportedescuento=?, ordenimportetotal=?, ordencomoubico=?, ordendatosclinicos=?, ordenimportemaquila=?, ordensexo=?, "
+				+ "formapagoid=?, ordenimporteotrocobro=? WHERE ordenid=?;", parametros);
+		log.info("Se actualizo exitosamente "+orden.get("ordenid").getAsLong());
+		return orden;
+	}
+
+	@Override
 	public JsonObject save(String jsonOrden) {
 		JsonObject orden = new Gson().fromJson(jsonOrden, JsonObject.class);
 		

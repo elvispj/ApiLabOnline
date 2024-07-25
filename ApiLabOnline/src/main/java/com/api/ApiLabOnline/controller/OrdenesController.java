@@ -46,9 +46,4 @@ public class OrdenesController {
 	public String saveUpdate(@RequestBody String jsonOrden){
 		return new Gson().toJson(ordenesService.save(jsonOrden));
 	}
-	
-	@PostMapping("/saveOrden")
-	public String saveUpdateOrden(@RequestBody String jsonOrden){
-		return new Gson().toJson(ordenesService.saveOrden(jsonOrden));
-	}
 }

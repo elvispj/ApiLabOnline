@@ -32,50 +32,28 @@ public class OrdenesService {
 
 	public JsonObject save(String jsonOrden) {
 		JsonObject orden = new Gson().fromJson(jsonOrden, JsonObject.class);
-		
-		if(orden.get("clienteid")==null || orden.get("clienteid").getAsString().equals("")
-				|| orden.get("clienteid").getAsInt()<1) {
-			JsonObject cliente = clientesRepository.save(orden.get("cliente").getAsJsonObject().toString());
-			orden.addProperty("clienteid", cliente.get("clienteid").getAsInt());
-		}
-		orden = ordenesRepository.save(orden.getAsJsonObject().toString());
-		if(orden!=null && orden.get("ordenid")!=null 
-				&& orden.get("ordenid").getAsInt()>0) {
-			JsonArray listaOrdenesDetalle=orden.get("ordenesdetalle").getAsJsonArray();
-			if(listaOrdenesDetalle==null || listaOrdenesDetalle.size()<1) {
-				System.out.println("La lista de ordendetalle esta vacia");
-				return null;
+		if(orden.get("ordenid")!=null && orden.get("ordenid").getAsInt()>0) {
+			return ordenesRepository.update(jsonOrden);
+		} else {
+			if(orden.get("clienteid")==null || orden.get("clienteid").getAsString().equals("")
+					|| orden.get("clienteid").getAsInt()<1) {
+				JsonObject cliente = clientesRepository.save(orden.get("cliente").getAsJsonObject().toString());
+				orden.addProperty("clienteid", cliente.get("clienteid").getAsInt());
 			}
-			for(JsonElement ordendetalle: listaOrdenesDetalle) {
-				ordendetalle.getAsJsonObject().addProperty("ordenid", orden.get("ordenid").getAsInt());
-				ordenedetalleRepository.save(ordendetalle.getAsJsonObject().toString());
+			orden = ordenesRepository.save(orden.getAsJsonObject().toString());
+			if(orden!=null && orden.get("ordenid")!=null 
+					&& orden.get("ordenid").getAsInt()>0) {
+				JsonArray listaOrdenesDetalle=orden.get("ordenesdetalle").getAsJsonArray();
+				if(listaOrdenesDetalle==null || listaOrdenesDetalle.size()<1) {
+					System.out.println("La lista de ordendetalle esta vacia");
+					return null;
+				}
+				for(JsonElement ordendetalle: listaOrdenesDetalle) {
+					ordendetalle.getAsJsonObject().addProperty("ordenid", orden.get("ordenid").getAsInt());
+					ordenedetalleRepository.save(ordendetalle.getAsJsonObject().toString());
+				}
+				return orden;
 			}
-			return orden;
-		}
-		return null;
-	}
-
-	public JsonObject saveOrden(String jsonOrden) {
-		JsonObject orden = new Gson().fromJson(jsonOrden, JsonObject.class);
-		
-		if(orden.get("clienteid")==null || orden.get("clienteid").getAsString().equals("")
-				|| orden.get("clienteid").getAsInt()<1) {
-			JsonObject cliente = clientesRepository.save(orden.get("cliente").getAsJsonObject().toString());
-			orden.addProperty("clienteid", cliente.get("clienteid").getAsInt());
-		}
-		orden = ordenesRepository.save(orden.getAsJsonObject().toString());
-		if(orden!=null && orden.get("ordenid")!=null 
-				&& orden.get("ordenid").getAsInt()>0) {
-			JsonArray listaOrdenesDetalle=orden.get("ordenesdetalle").getAsJsonArray();
-			if(listaOrdenesDetalle==null || listaOrdenesDetalle.size()<1) {
-				System.out.println("La lista de ordendetalle esta vacia");
-				return null;
-			}
-			for(JsonElement ordendetalle: listaOrdenesDetalle) {
-				ordendetalle.getAsJsonObject().addProperty("ordenid", orden.get("ordenid").getAsInt());
-				ordenedetalleRepository.save(ordendetalle.getAsJsonObject().toString());
-			}
-			return orden;
 		}
 		return null;
 	}
