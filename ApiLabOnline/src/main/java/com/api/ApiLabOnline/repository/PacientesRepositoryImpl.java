@@ -9,7 +9,10 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import com.api.ApiLabOnline.utils.Utils;
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 @Repository
@@ -71,8 +74,47 @@ public class PacientesRepositoryImpl implements PacientesRepository {
 
 	@Override
 	public JsonObject save(String jsonPaciente) {
-		// TODO Auto-generated method stub
-		return null;
+		JsonObject paciente = new Gson().fromJson(jsonPaciente, JsonObject.class);
+		
+		paciente.addProperty("pacienteid", jdbcTemplate.queryForObject("SELECT nextval('pacientes_pacienteid_seq') as id;", Long.class));
+		paciente.addProperty("pacienteactivo", true);
+		paciente.addProperty("pacientefechacreacion", Utils.getFechaActual());
+		paciente.addProperty("pacientefechamodificacion", Utils.getFechaActual());
+		paciente.addProperty("bitacoraid", -1);
+
+		Object[] parametros = {paciente.get("pacienteid").getAsLong(), paciente.get("pacienteactivo").getAsBoolean(), paciente.get("doctorid").getAsInt(), 
+				paciente.get("pacientenombre").getAsString(), paciente.get("pacienteapellidopaterno").getAsString(), paciente.get("pacienteapellidomaterno").getAsString(), 
+				paciente.get("pacientesexo").getAsString(), paciente.get("pacientefechanacimiento").getAsString(), paciente.get("pacienteedad").getAsInt(), 
+				paciente.get("pacientetiposangre").getAsString(), paciente.get("pacienteemail").getAsString(), paciente.get("pacientetelefono").getAsString(), 
+				paciente.get("pacientedireccion").getAsString(), paciente.get("pacientefechacreacion").getAsString(), 
+				paciente.get("pacientefechamodificacion").getAsString(), paciente.get("bitacoraid").getAsInt()};
+		log.info(paciente.toString());
+		jdbcTemplate.update("INSERT INTO pacientes(pacienteid, pacienteactivo, doctorid, pacientenombre, pacienteapellidopaterno, pacienteapellidomaterno, "
+				+"pacientesexo, pacientefechanacimiento, pacienteedad, pacientetiposangre, pacienteemail, pacientetelefono, pacientedireccion, pacientefechacreacion, pacientefechamodificacion, bitacoraid) "
+				+ "VALUES(?, ?, ?, ?, ?, ?, ?, ?::date, ?, ?, ?, ?, ?, ?::timestamp, ?::timestamp, ?);", parametros);
+		log.info("Se registro exitosamente "+paciente.get("pacienteid").getAsLong());
+		return paciente;
+	}
+
+	@Override
+	public JsonElement update(String jsonPaciente) {
+		JsonObject paciente = new Gson().fromJson(jsonPaciente, JsonObject.class);
+		paciente.addProperty("pacientefechamodificacion", Utils.getFechaActual());
+
+		Object[] parametros = {paciente.get("pacienteactivo").getAsBoolean(), paciente.get("doctorid").getAsInt(), paciente.get("pacientenombre").getAsString(), 
+				paciente.get("pacienteapellidopaterno").getAsString(), paciente.get("pacienteapellidomaterno").getAsString(), paciente.get("pacientesexo").getAsString(), 
+				paciente.get("pacientefechanacimiento").getAsString(), paciente.get("pacienteedad").getAsInt(), paciente.get("pacientetiposangre").getAsString(), 
+				paciente.get("pacienteemail").getAsString(), paciente.get("pacientetelefono").getAsString(), paciente.get("pacientedireccion").getAsString(), 
+				paciente.get("pacientefechamodificacion").getAsString(), paciente.get("pacienteid").getAsLong()};
+		int count = jdbcTemplate.update("UPDATE pacientes SET pacienteactivo=?, doctorid=?, pacientenombre=?, pacienteapellidopaterno=?, pacienteapellidomaterno=?, "
+				+"pacientesexo=?, pacientefechanacimiento=?::date, pacienteedad=?, pacientetiposangre=?, pacienteemail=?, pacientetelefono=?, pacientedireccion=?, "
+				+"pacientefechamodificacion=?::timestamp WHERE pacienteid=?;", parametros);
+		if(count<1) {
+			log.info("No se logro actualizar la informacion del paciente");
+			return null;
+		}
+		log.info("Se actualizo exitosamente "+paciente.get("ordenid").getAsLong());
+		return paciente;
 	}
 
 }

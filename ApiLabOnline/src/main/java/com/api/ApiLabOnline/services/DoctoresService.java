@@ -31,7 +31,8 @@ public class DoctoresService {
 
 	public JsonObject findByUsuarioId(Long usuarioid) {
 		JsonObject doctor = doctoresRepository.findByUsuarioId(usuarioid);
-		doctor.add("especialidades", especialidadesService.listByDoctorid(doctor.get("doctorid").getAsLong()));
+		if(doctor!=null)
+			doctor.add("especialidades", especialidadesService.listByDoctorid(doctor.get("doctorid").getAsLong()));
 		return doctor;
 	}
 

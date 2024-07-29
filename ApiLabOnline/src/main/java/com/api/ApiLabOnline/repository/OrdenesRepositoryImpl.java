@@ -37,6 +37,7 @@ public class OrdenesRepositoryImpl implements OrdenesRepository {
 
 	@Override
 	public JsonObject findById(Long id) {
+		log.info("findById-"+id);
 		JsonObject jsonObject = new JsonObject();
 		JsonArray ordendetalle = new JsonArray();
 		List<JsonObject> listResponse = jdbcTemplate.query("select * FROM ordenes WHERE ordenid=?",new JsonObjectRowMapper(),id);
@@ -78,11 +79,15 @@ public class OrdenesRepositoryImpl implements OrdenesRepository {
 				orden.get("ordenimportedescuento").getAsDouble(), orden.get("ordenimportetotal").getAsDouble(), orden.get("ordencomoubico").getAsString(), 
 				orden.get("ordendatosclinicos").getAsString(), orden.get("ordenimportemaquila").getAsDouble(), orden.get("ordensexo").getAsString(), 
 				orden.get("formapagoid").getAsString(), orden.get("ordenimporteotrocobro").getAsDouble(), orden.get("ordenid").getAsLong()};
-		jdbcTemplate.update("UPDATE ordenes "
+		int count = jdbcTemplate.update("UPDATE ordenes "
 				+ "SET ordenactiva=?,colaboradorid=?, clienteid=?, ordennombre=?, ordenedad=?, ordentelefono=?, ordendireccion=?, ordenformaentrega=?, "
 				+ "ordenfechamodificacion=?::timestamp, doctorid=?, ordenorigen=?, ordencomentarios=?, ordenimporte=?, ordenimporteiva=?, "
 				+ "ordendescuento=?, ordenimportedescuento=?, ordenimportetotal=?, ordencomoubico=?, ordendatosclinicos=?, ordenimportemaquila=?, ordensexo=?, "
 				+ "formapagoid=?, ordenimporteotrocobro=? WHERE ordenid=?;", parametros);
+		if(count<1) {
+			log.info("No se logro actualizar la informacion de la orden");
+			return null;
+		}
 		log.info("Se actualizo exitosamente "+orden.get("ordenid").getAsLong());
 		return orden;
 	}

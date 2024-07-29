@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.api.ApiLabOnline.repository.PacientesRepository;
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -30,7 +31,12 @@ public class PacientesService {
 	}
 
 	public JsonElement save(String jsonPaciente) {
-		return pacientesRepository.save(jsonPaciente);
+		JsonObject paciente = new Gson().fromJson(jsonPaciente, JsonObject.class);
+		if(paciente.get("pacienteid")!=null && paciente.get("pacienteid").getAsInt()>0) {
+			return pacientesRepository.update(jsonPaciente);
+		} else {
+			return pacientesRepository.save(jsonPaciente);
+		}
 	}
 
 }

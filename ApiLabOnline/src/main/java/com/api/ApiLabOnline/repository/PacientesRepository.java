@@ -1,6 +1,7 @@
 package com.api.ApiLabOnline.repository;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 public interface PacientesRepository {
@@ -14,5 +15,7 @@ public interface PacientesRepository {
 	JsonObject findById(Long pacienteid);
 
 	JsonObject save(String jsonPaciente);
+
+	JsonElement update(String jsonPaciente);
 
 }

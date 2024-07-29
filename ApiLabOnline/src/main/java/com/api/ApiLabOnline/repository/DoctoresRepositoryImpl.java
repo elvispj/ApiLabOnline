@@ -53,6 +53,9 @@ public class DoctoresRepositoryImpl implements DoctoresRepository {
 	    } catch (EmptyResultDataAccessException e) {
 	    	log.info("NO encontro informacion del doctor");
 	        return null;
+	    } catch(Exception ex) {
+	    	ex.printStackTrace();
+	    	return null;
 	    }
 	}
 
@@ -63,6 +66,9 @@ public class DoctoresRepositoryImpl implements DoctoresRepository {
 	    } catch (EmptyResultDataAccessException e) {
 	    	log.info("NO encontro informacion del doctor");
 	        return null;
+	    } catch(Exception ex) {
+	    	ex.printStackTrace();
+	    	return null;
 	    }
 	}
 
