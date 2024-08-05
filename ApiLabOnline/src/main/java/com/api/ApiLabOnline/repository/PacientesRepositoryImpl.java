@@ -92,7 +92,7 @@ public class PacientesRepositoryImpl implements PacientesRepository {
 		jdbcTemplate.update("INSERT INTO pacientes(pacienteid, pacienteactivo, doctorid, pacientenombre, pacienteapellidopaterno, pacienteapellidomaterno, "
 				+"pacientesexo, pacientefechanacimiento, pacienteedad, pacientetiposangre, pacienteemail, pacientetelefono, pacientedireccion, pacientefechacreacion, pacientefechamodificacion, bitacoraid) "
 				+ "VALUES(?, ?, ?, ?, ?, ?, ?, ?::date, ?, ?, ?, ?, ?, ?::timestamp, ?::timestamp, ?);", parametros);
-		log.info("Se registro exitosamente "+paciente.get("pacienteid").getAsLong());
+		log.info("Se registro exitosamente el paciente "+paciente.get("pacienteid").getAsLong());
 		return paciente;
 	}
 
@@ -113,7 +113,7 @@ public class PacientesRepositoryImpl implements PacientesRepository {
 			log.info("No se logro actualizar la informacion del paciente");
 			return null;
 		}
-		log.info("Se actualizo exitosamente "+paciente.get("ordenid").getAsLong());
+		log.info("Se actualizo exitosamente el pacienteid "+paciente.get("pacienteid").getAsLong());
 		return paciente;
 	}
 
