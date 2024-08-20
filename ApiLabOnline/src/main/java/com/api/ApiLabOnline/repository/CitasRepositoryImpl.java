@@ -93,7 +93,7 @@ public class CitasRepositoryImpl implements CitasRepository {
 				cita.get("citalugar").getAsString(), cita.get("citacomentarios").getAsString(), 
 				cita.get("citafechamodificacion").getAsString(), cita.get("citaid").getAsLong() };
 		jdbcTemplate.update("UPDATE doctorcitas SET doctorid=?, pacienteid=?, citaestatusid=?, citanombre=?, citafecha=?::timestamp, "
-				+"citalugar=?, citacomentarios=?, citafechacreacion=?::timestamp WHERE citaid=?;", parametros);
+				+"citalugar=?, citacomentarios=?, citafechamodificacion=?::timestamp WHERE citaid=?;", parametros);
 		log.info("Se actualizo exitosamente "+cita.toString());
 		return cita;
 	}
