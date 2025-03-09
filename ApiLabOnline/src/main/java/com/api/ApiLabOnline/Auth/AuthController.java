@@ -1,5 +1,11 @@
 package com.api.ApiLabOnline.Auth;
 
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -21,8 +27,9 @@ public class AuthController {
 	private AuthService authService;
 	
 	@PostMapping("login")
-	public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
-		return ResponseEntity.ok(authService.login(request));
+	public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest loginRequest,
+			HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		return ResponseEntity.ok(authService.login(loginRequest, request, response));
 	}
 	
 	@PostMapping("register")
@@ -33,5 +40,15 @@ public class AuthController {
 	@PostMapping("update")
 	public ResponseEntity<AuthResponse> update(@RequestBody ChangeRequest request) {
 		return ResponseEntity.ok(authService.update(request));
+	}
+	
+	@PostMapping("refresh")
+	public ResponseEntity<AuthResponse> refresh(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		System.out.println("Solicito refresh");
+		AuthResponse res = authService.refresh(request,response);
+//		if(res!=null)
+			return ResponseEntity.ok(res);
+//		else
+//			throw new UsernameNotFoundException("No existe...");
 	}
 }

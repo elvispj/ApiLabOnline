@@ -5,6 +5,8 @@ import com.google.gson.JsonObject;
 
 public interface MensajesRepository {
 
+	JsonArray getMensajetipos();
+
 	JsonArray listByDoctorid(Long doctorid);
 
 	JsonArray listByClienteid(Long clienteid);

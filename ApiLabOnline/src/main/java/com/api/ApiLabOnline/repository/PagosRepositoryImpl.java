@@ -2,7 +2,8 @@ package com.api.ApiLabOnline.repository;
 
 import java.util.List;
 
-import org.jboss.logging.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -15,7 +16,7 @@ import com.google.gson.JsonObject;
 
 @Repository
 public class PagosRepositoryImpl implements PagosRepository {
-	private Logger log = Logger.getLogger(this.getClass());
+	private Logger log = LogManager.getLogger(this.getClass());
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
@@ -91,7 +92,6 @@ public class PagosRepositoryImpl implements PagosRepository {
 		JsonObject jsonPagos = new Gson().fromJson(pago, JsonObject.class);
 		
 		jsonPagos.addProperty("pagoid", jdbcTemplate.queryForObject("SELECT nextval('pagos_pagoid_seq') as id;", Long.class));
-		jsonPagos.addProperty("pagoestatusid", "PEN");
 		jsonPagos.addProperty("pagofechacreacion", Utils.getFechaActual());
 		jsonPagos.addProperty("pagofechamodificacion", Utils.getFechaActual());
 //		jsonCompras.addProperty("bitacoraid", -1);

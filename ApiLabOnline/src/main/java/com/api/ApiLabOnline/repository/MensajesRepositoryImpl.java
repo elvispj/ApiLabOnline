@@ -26,6 +26,16 @@ public class MensajesRepositoryImpl implements MensajesRepository {
     }
 
 	@Override
+	public JsonArray getMensajetipos() {
+		JsonArray lista = new JsonArray();
+		List<JsonObject> listaJsonObject = jdbcTemplate.query("select * from mensajetipos where mensajetipoactivo is true order by mensajetiponombre", new JsonObjectRowMapper());
+		for(JsonObject jsonObjecto: listaJsonObject) {
+			lista.add(jsonObjecto);
+		}
+		return lista;
+	}
+
+	@Override
 	public JsonArray listByDoctorid(Long doctorid) {
 		JsonArray lista = new JsonArray();
 		Object[] parameters = {"ELI",doctorid};
@@ -70,9 +80,18 @@ public class MensajesRepositoryImpl implements MensajesRepository {
 			mensaje.remove("mensajerespuesta");
 			mensaje.addProperty("mensajerespuesta", "{}");
 		}
+		if(!mensaje.has("doctorid") || mensaje.get("doctorid")==null 
+				|| mensaje.get("doctorid").getAsString().trim().length()<1) {
+			mensaje.remove("doctorid");
+		}
+		if(!mensaje.has("clienteid") || mensaje.get("clienteid")==null 
+				|| mensaje.get("clienteid").getAsString().trim().length()<1) {
+			mensaje.remove("clienteid");
+		}
 
 		Object[] parametros = {mensaje.get("mensajetipoid").getAsString(),mensaje.get("mensajeestatusid").getAsString(),
-				mensaje.get("doctorid").getAsInt(), mensaje.get("clienteid").getAsInt(), 
+				(mensaje.has("doctorid") ? mensaje.get("doctorid").getAsInt() : null), 
+				(mensaje.has("clienteid") ? mensaje.get("clienteid").getAsInt() : null), 
 				mensaje.get("mensajetitulo").getAsString(),mensaje.get("mensajecuerpo").getAsString(),
 				mensaje.get("mensajerespuesta").getAsString(),mensaje.get("mensajefechamodificacion").getAsString(),
 				mensaje.get("mensajeid").getAsLong() };

@@ -2,7 +2,8 @@ package com.api.ApiLabOnline.repository;
 
 import java.util.List;
 
-import org.jboss.logging.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -15,7 +16,7 @@ import com.google.gson.JsonObject;
 
 @Repository
 public class EstudiosRepositoryImpl implements EstudiosRepository {
-	private Logger log = Logger.getLogger(this.getClass());
+	private Logger log = LogManager.getLogger(this.getClass());
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;

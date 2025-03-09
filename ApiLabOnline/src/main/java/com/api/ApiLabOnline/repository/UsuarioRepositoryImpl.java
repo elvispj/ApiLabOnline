@@ -1,6 +1,9 @@
 package com.api.ApiLabOnline.repository;
 
-import org.jboss.logging.Logger;
+import java.util.List;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -11,7 +14,7 @@ import com.api.ApiLabOnline.entity.Usuario;
 
 @Repository
 public class UsuarioRepositoryImpl implements UsuarioRepository {
-	private Logger log = Logger.getLogger(this.getClass());
+	private Logger log = LogManager.getLogger(this.getClass());
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
@@ -22,15 +25,18 @@ public class UsuarioRepositoryImpl implements UsuarioRepository {
 
 	@Override
 	public Usuario findByUsuariocorreo(String usuariocorreo) {
-		log.info("find by usuariocorreo-"+usuariocorreo);
 		try {
-			return jdbcTemplate.query("select * from usuarios where usuarioactivo is true and usuariocorreo=?", 
-					new BeanPropertyRowMapper<Usuario>(Usuario.class), usuariocorreo).get(0);
+			log.info("find by usuariocorreo-"+usuariocorreo);
+			List<Usuario> usuario = jdbcTemplate.query("select * from usuarios where usuarioactivo is true and usuariocorreo=?", 
+					new BeanPropertyRowMapper<Usuario>(Usuario.class), usuariocorreo);
+			if(usuario!=null && usuario.size()>0)
+				return usuario.get(0);
+	    	log.info("No encontro informacion del usuario");
 	    } catch (EmptyResultDataAccessException e) {
 	    	e.printStackTrace();
 	    	log.info("No encontro informacion del usuario");
-	        return null;
 	    }
+        return null;
 	}
 
 	@Override
@@ -41,7 +47,7 @@ public class UsuarioRepositoryImpl implements UsuarioRepository {
 	}
 
 	@Override
-	public Usuario save(Usuario usuario) {
+	public Usuario save(Usuario usuario){
 		Object[] parameters;
 		if(usuario.getUsuarioid()>0){
 			log.info("update >> "+usuario.toString());
@@ -51,7 +57,7 @@ public class UsuarioRepositoryImpl implements UsuarioRepository {
 					usuario.getUsuariofechamodificacion(), usuario.getUsuarioultimoacceso(), 
 					usuario.getUsuariokey(), usuario.getUsuarioimage(), usuario.getUsuarioid()};
 			jdbcTemplate.update("UPDATE usuarios SET perfilid=?, colaboradorid=?, usuarioactivo=?, usuariocorreo=?, "
-					+"usuariopwd=?, usuarionombre=?', usuarioapellidopaterno=?', usuarioapellidomaterno=?, usuariofechamodificacion=?::timestamp, "
+					+"usuariopwd=?, usuarionombre=?, usuarioapellidopaterno=?, usuarioapellidomaterno=?, usuariofechamodificacion=?::timestamp, "
 					+"usuarioultimoacceso=?::timestamp, usuariokey=?, usuarioimage=? WHERE usuarioid=?;", parameters);
 		} else {
 			usuario.setUsuarioid(jdbcTemplate.queryForObject("SELECT nextval('usuariosid_seq') as id;", Integer.class));

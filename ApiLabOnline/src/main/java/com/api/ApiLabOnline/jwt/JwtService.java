@@ -13,7 +13,6 @@ import com.api.ApiLabOnline.entity.Usuario;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 
@@ -25,15 +24,35 @@ public class JwtService {
 	public String getToken(Usuario user) {
 		return getToken(new HashMap<>(), user);
 	}
+	
+	public String getRefreshToken(Usuario user) {
+		return getRefreshToken(new HashMap<>(), user);
+	}
 
 	private String getToken(Map<String, Object> extraClaims, Usuario user) {
 		return Jwts
 				.builder()
-				.setClaims(extraClaims)
-				.setSubject(user.getUsuariocorreo())
-				.setIssuedAt(new Date(System.currentTimeMillis()))
-				.setExpiration(new Date(System.currentTimeMillis()+(1000*60*60*24)))
-				.signWith(getKey(), SignatureAlgorithm.HS256)
+				.claims(extraClaims)
+				.subject(user.getUsuariocorreo())
+				.issuedAt(new Date(System.currentTimeMillis()))
+				.expiration(new Date(System.currentTimeMillis()+(1000*60*1)))
+//				.signWith(getKey(), Jwts.SIG.HS256)
+//				.signWith(getKey(), SignatureAlgorithm.HS256)
+				.signWith(getKey())
+				.setHeaderParam("Access-Control-Expose-Headers", "*")
+				.compact();
+	}
+
+	private String getRefreshToken(Map<String, Object> extraClaims, Usuario user) {
+		return Jwts
+				.builder()
+				.claims(extraClaims)
+				.subject(user.getUsuariocorreo())
+				.issuedAt(new Date(System.currentTimeMillis()))
+				.expiration(new Date(System.currentTimeMillis()+(1000*60*40)))
+//				.signWith(getKey(), Jwts.SIG.HS256)
+//				.signWith(getKey(), SignatureAlgorithm.HS256)
+				.signWith(getKey())
 				.setHeaderParam("Access-Control-Expose-Headers", "*")
 				.compact();
 	}
@@ -52,6 +71,13 @@ public class JwtService {
         String username=getUserNameFromToken(token);
         
         return (username.equals(usuariocorreo) && !isTokenExpired(token));
+    }
+
+    public boolean isTokenRefreshValid(String token, String usuariocorreo) {
+        
+        String username=getUserNameFromToken(token);
+        
+        return (username.equals(usuariocorreo));
     }
     
     private Claims getAllClaims(String token) {

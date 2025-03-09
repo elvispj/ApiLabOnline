@@ -14,6 +14,10 @@ public class MensajesService {
 	@Autowired
 	private MensajesRepository mensajesRepository;
 
+	public JsonArray getMensajetipos() {
+		return mensajesRepository.getMensajetipos();
+	}
+
 	public JsonArray listByClienteid(Long pacienteid) {
 		return mensajesRepository.listByClienteid(pacienteid);
 	}

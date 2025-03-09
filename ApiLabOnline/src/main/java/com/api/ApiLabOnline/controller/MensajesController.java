@@ -22,6 +22,12 @@ public class MensajesController {
 	
 	private Logger log = LogManager.getLogger(MensajesController.class);
 	
+	@GetMapping("/listMensajetipos/")
+	public String getMensajetipos(){
+		log.info("get listMensajetipos");
+		return new Gson().toJson(mensajesService.getMensajetipos());
+	}
+	
 	@GetMapping("/listByClienteid/{clienteid}")
 	public String getByClienteid(@PathVariable("clienteid") Long clienteid){
 		log.info("Search getByDoctorid "+clienteid);

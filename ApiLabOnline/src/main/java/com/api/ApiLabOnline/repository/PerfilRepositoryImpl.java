@@ -1,6 +1,7 @@
 package com.api.ApiLabOnline.repository;
 
-import org.jboss.logging.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -10,7 +11,7 @@ import com.api.ApiLabOnline.entity.Perfil;
 
 @Repository
 public class PerfilRepositoryImpl implements PerfilRepository {
-	private Logger log = Logger.getLogger(this.getClass());
+	private Logger log = LogManager.getLogger(this.getClass());
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;

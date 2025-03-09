@@ -5,7 +5,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.jboss.logging.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -21,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class UsuarioServices {
-	private Logger log = Logger.getLogger(this.getClass());
+	private Logger log = LogManager.getLogger(this.getClass());
 	@Autowired
 	private UsuarioRepository usuarioRepository;
 	@Autowired
@@ -29,6 +30,8 @@ public class UsuarioServices {
 	
 	public User getUser(String usuariocorreo) {
 		Usuario usuario = usuarioRepository.findByUsuariocorreo(usuariocorreo);
+		if(usuario==null)
+			return null;
 	    List<GrantedAuthority> authorities = buildUserAuthority(perfilRepository.findByPerfilid(usuario.getPerfilid()));
 		return buildUserForAuthentication(usuario,authorities);
 	}

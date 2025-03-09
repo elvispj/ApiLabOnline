@@ -21,7 +21,7 @@ public class JsonObjectRowMapper implements RowMapper<JsonObject> {
         int colCount = rsMeta.getColumnCount();
 
         for (int i = 1; i <= colCount; i++) {
-        	columns.addProperty(rsMeta.getColumnLabel(i), (rs.getObject(i)!=null ? rs.getObject(i).toString() : ""));
+        	columns.addProperty(rsMeta.getColumnLabel(i), (rs.getObject(i)!=null ? rs.getObject(i).toString().trim() : ""));
         }
         return columns;
     }
