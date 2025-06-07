@@ -7,6 +7,8 @@ public interface ComprasRepository {
 
 	JsonArray getAll();
 
+	JsonArray getComprasProveedor();
+
 	JsonArray list(int limit, int offset);
 
 	JsonObject findById(Long id);

@@ -15,4 +15,5 @@ public class AuthResponse {
 	Usuario usuario;
 	String token;
 	String refreshtoken;
+	String modulos;
 }

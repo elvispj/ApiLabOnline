@@ -71,13 +71,13 @@ public class EstudiosRepositoryImpl implements EstudiosRepository {
 		jsonEstudio.addProperty("estudiofechamodificacion", Utils.getFechaActual());
 		jsonEstudio.addProperty("bitacoraid", -1);
 		Object[] parametros = {
-				jsonEstudio.get("estudioid").getAsString(), jsonEstudio.get("tipoestudioid").getAsString(), 
-				jsonEstudio.get("estudioactivo").getAsString(), jsonEstudio.get("estudionombre").getAsString(), 
+				jsonEstudio.get("estudioid").getAsInt(), jsonEstudio.get("tipoestudioid").getAsInt(), 
+				jsonEstudio.get("estudioactivo").getAsBoolean(), jsonEstudio.get("estudionombre").getAsString(), 
 				jsonEstudio.get("estudiodescripcion").getAsString(), jsonEstudio.get("estudiofechacreacion").getAsString(), 
-				jsonEstudio.get("estudiofechamodificacion").getAsString(), jsonEstudio.get("bitacoraid").getAsString(), 
-				jsonEstudio.get("estudionombrecorto").getAsString(), jsonEstudio.get("estudiocosto").getAsString()};
-		jdbcTemplate.update("INSERT INTO estudios("
-				+ "estudioid, tipoestudioid, estudioactivo, estudionombre, estudiodescripcion, estudiofechacreacion, estudiofechamodificacion, bitacoraid, estudionombrecorto, estudiocosto) "
+				jsonEstudio.get("estudiofechamodificacion").getAsString(), jsonEstudio.get("bitacoraid").getAsInt(), 
+				jsonEstudio.get("estudionombrecorto").getAsString(), jsonEstudio.get("estudiocosto").getAsFloat()};
+		jdbcTemplate.update("INSERT INTO estudios(estudioid, tipoestudioid, estudioactivo, estudionombre, estudiodescripcion, "
+				+ "estudiofechacreacion, estudiofechamodificacion, bitacoraid, estudionombrecorto, estudiocosto) "
 				+"VALUES(?, ?, ?, ?, ?, cast(? as timestamp), cast(? as timestamp), ?, ?, ? )", parametros);
 		
 		return jsonEstudio;

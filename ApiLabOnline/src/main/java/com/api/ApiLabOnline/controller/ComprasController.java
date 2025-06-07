@@ -28,6 +28,11 @@ public class ComprasController {
 		return list.toString();
 	}
 	
+	@GetMapping("/allCompras")
+	public String allCompras(){
+		return comprasServices.getComprasProovedor().toString();
+	}
+	
 	@GetMapping("/list")
 	public String list(@RequestParam("limit") int limit,@RequestParam("offset") int offset){
 		JsonArray list = comprasServices.list(limit, offset);

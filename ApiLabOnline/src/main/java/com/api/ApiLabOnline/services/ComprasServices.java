@@ -16,6 +16,10 @@ public class ComprasServices {
 	public JsonArray getAll() {
 		return comprasRepository.getAll();
 	}
+
+	public JsonArray getComprasProovedor() {
+		return comprasRepository.getComprasProveedor();
+	}
 	
 	public JsonArray list(int limit, int offset){
 		return comprasRepository.list(limit, offset);

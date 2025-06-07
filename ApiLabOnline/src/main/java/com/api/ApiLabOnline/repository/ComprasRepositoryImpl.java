@@ -39,6 +39,28 @@ public class ComprasRepositoryImpl implements ComprasRepository {
 	}
 
 	@Override
+	public JsonArray getComprasProveedor() {
+	
+		log.debug("Buscar compras con provvedor");
+		JsonArray lista = new JsonArray();
+		List<JsonObject> listaJsonObject = jdbcTemplate.query(
+				"SELECT p.proveedornombre,compraid,proveedorid,compraactivo, "
+				+"compranumeroarticulos,compraimporteneto,compraimporteiva, "
+				+"compraimportetotal,comprafechacreacion,comprafechamodificacion, "
+				+"c.bitacoraid,array_to_json(array_agg(row_to_json(i.*))) as listaInventario "
+				+"FROM compras c "
+				+"JOIN proveedores p using(proveedorid) "
+				+"LEFT JOIN inventario i using(compraid) "
+				+"GROUP BY 1,2,3,4,5,6,7,8,9,10,11 "
+				+"order by compraid desc ", 
+				new JsonObjectRowMapper());
+		for(JsonObject jsonObjecto: listaJsonObject) {
+			lista.add(jsonObjecto);
+		}
+		return lista;
+	}
+
+	@Override
 	public JsonArray list(int limit, int offset) {
 		log.debug("Buscar todos limit["+limit+"] offset["+offset+"]");
 		JsonArray lista = new JsonArray();

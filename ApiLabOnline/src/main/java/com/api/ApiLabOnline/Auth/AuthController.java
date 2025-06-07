@@ -44,11 +44,7 @@ public class AuthController {
 	
 	@PostMapping("refresh")
 	public ResponseEntity<AuthResponse> refresh(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		System.out.println("Solicito refresh");
-		AuthResponse res = authService.refresh(request,response);
-//		if(res!=null)
-			return ResponseEntity.ok(res);
-//		else
-//			throw new UsernameNotFoundException("No existe...");
+		System.out.println("\n\t\t ********* REFRESH TOKEN ********* ");
+		return ResponseEntity.ok(authService.refresh(request,response));
 	}
 }

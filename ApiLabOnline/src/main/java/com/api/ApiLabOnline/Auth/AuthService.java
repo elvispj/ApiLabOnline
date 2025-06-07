@@ -62,6 +62,7 @@ public class AuthService {
 				.usuario(usuario)
 				.token(jwtService.getToken(usuario))
 				.refreshtoken(jwtService.getRefreshToken(usuario))
+				.modulos(null)
 				.build();
 		log.info("Get User >> "+usuario.toString());
 		log.info("Return>>",res.toString());

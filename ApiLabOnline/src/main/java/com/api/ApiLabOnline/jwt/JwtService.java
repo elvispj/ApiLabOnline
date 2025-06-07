@@ -35,7 +35,7 @@ public class JwtService {
 				.claims(extraClaims)
 				.subject(user.getUsuariocorreo())
 				.issuedAt(new Date(System.currentTimeMillis()))
-				.expiration(new Date(System.currentTimeMillis()+(1000*60*1)))
+				.expiration(new Date(System.currentTimeMillis()+(1000*60*30)))
 //				.signWith(getKey(), Jwts.SIG.HS256)
 //				.signWith(getKey(), SignatureAlgorithm.HS256)
 				.signWith(getKey())
